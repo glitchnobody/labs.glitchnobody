@@ -135,7 +135,7 @@ export function DesktopDrop({ files = 3, iconSize = 44, labels = true, tags = "P
       pr.started = true;
       setDragging(true);
       slide();
-      pr.moving.filter((k) => k !== pr.i).forEach((k, j) => later(60 + j * 60, () => snd("tick", { volume: 0.35, pitch: 1 + 0.06 * j })));
+      pr.moving.filter((k) => k !== pr.i).forEach((_, j) => later(60 + j * 60, () => snd("tick", { volume: 0.35, pitch: 1 + 0.06 * j })));
     }
     stackTo(p.x, p.y, pr.moving, pr.i);
     setHot(nearFolder(p.x, p.y));

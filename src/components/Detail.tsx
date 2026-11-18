@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { blocks, type Knob } from "../lab";
 import { play } from "../lab/sound";
 import Block from "./Block";
@@ -119,14 +120,14 @@ export default function Detail({ slug, onClose }: { slug: string; onClose: () =>
     () => document.documentElement.dataset.theme ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"),
   );
   const [stroke, setStroke] = useState("off");
-  const [code, setCode] = useState<Code | null>(null);
-
-  useEffect(() => {
-    fetch(`/${slug}.json`)
-      .then((r) => r.json())
-      .then(setCode)
-      .catch(() => setCode({ files: [], how: [] }));
-  }, [slug]);
+  /* the code view (highlighted files and how-it-works notes) comes from the server
+     route /api/code/$slug, cached by TanStack Query so reopening a component is instant */
+  const { data, isError } = useQuery({
+    queryKey: ["code", slug],
+    queryFn: () => fetch(`/api/code/${slug}`).then((r) => r.json() as Promise<Code>),
+    staleTime: Infinity,
+  });
+  const code: Code | null = data ?? (isError ? { files: [], how: [] } : null);
 
   /* the usage snippet follows the knobs, so what is copied is what is on the stage */
   const name = code?.files[0]?.name.replace(".tsx", "") ?? "";

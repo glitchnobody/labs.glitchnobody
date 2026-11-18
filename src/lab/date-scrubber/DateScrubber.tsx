@@ -20,7 +20,7 @@
    marker, so ticks swell as they pass under it. Mondays and the 1st of each
    month are taller, and months stay dark at any distance. */
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 type Sound = (name: string, o?: { volume?: number; pitch?: number; loop?: boolean }) => unknown;
 

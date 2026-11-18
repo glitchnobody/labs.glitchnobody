@@ -1,8 +1,0 @@
----
-import Wall from '../components/Wall.astro';
-import { blocks } from '../lab';
-
-export const getStaticPaths = () => Object.keys(blocks).map((slug) => ({ params: { slug } }));
----
-
-<Wall open={Astro.params.slug} />

@@ -1,36 +1,20 @@
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { blocks } from "../lab";
 import Detail from "./Detail";
 import { play } from "../lab/sound";
 
-const slugOf = (path: string) => {
-  const slug = path.replace(/^\/|\/$/g, "");
-  return slug in blocks ? slug : null;
-};
-
-/* the component modal over the wall. The URL is the state: opening a card
-   pushes /slug, closing pushes /, and Back / Forward walk between them */
+/* the component modal over the wall. The URL is the state: /<slug> opens it, /
+   closes it, and Back / Forward walk between them (TanStack Router owns history;
+   a[data-block] links are turned into router navigations by the root route) */
 export default function Modal() {
-  const [slug, setSlug] = useState(() => slugOf(location.pathname));
+  const params = useParams({ strict: false }) as { slug?: string };
+  const slug = params.slug && params.slug in blocks ? params.slug : null;
+  const navigate = useNavigate();
   const dialog = useRef<HTMLDialogElement>(null);
-  const [view, setView] = useState(slug); // what the dialog shows; outlives slug while it shrinks away
-
-  useEffect(() => {
-    const click = (e: MouseEvent) => {
-      const link = (e.target as Element).closest<HTMLAnchorElement>("a[data-block]");
-      if (!link || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return; // let new-tab clicks through
-      e.preventDefault();
-      history.pushState(null, "", link.href);
-      setSlug(link.dataset.block!);
-    };
-    const pop = () => setSlug(slugOf(location.pathname));
-    document.addEventListener("click", click);
-    addEventListener("popstate", pop);
-    return () => {
-      document.removeEventListener("click", click);
-      removeEventListener("popstate", pop);
-    };
-  }, []);
+  /* what the dialog shows; set on the client only (Detail reads the document),
+     and it outlives slug while the card shrinks back */
+  const [view, setView] = useState<string | null>(null);
 
   /* opening: the card itself lifts off the wall and travels to the middle,
      growing into the stage (moved with a transform and uncropped with a clip-path,
@@ -121,10 +105,7 @@ export default function Modal() {
     }
   }, [view, opens]);
 
-  const close = () => {
-    history.pushState(null, "", "/");
-    setSlug(null);
-  };
+  const close = () => navigate({ to: "/", resetScroll: false });
 
   return (
     <dialog

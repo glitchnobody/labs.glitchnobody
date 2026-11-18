@@ -1,0 +1,9 @@
+/* Tailwind v4 (from the TanStack CLI scaffold) without its preflight reset, so the
+   site's own reset and design system in site.css and tokens.css stay in charge.
+   Utility classes are available; unlayered site CSS wins over them. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@import "./lab/tokens.css";
+@import "./site.css";

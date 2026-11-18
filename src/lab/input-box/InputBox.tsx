@@ -185,7 +185,6 @@ export function InputBox({
   };
 
   const floated = focus || value.length > 0;
-  const left = len;
   const remaining = limit - len;
   const frac = Math.min(1, len / limit);
   const C = 2 * Math.PI * 7;

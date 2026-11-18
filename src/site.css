@@ -291,7 +291,7 @@ kbd {
 
 /* each block takes the pointer back for itself. :where() keeps this at zero
    specificity, so a block that marks its own air (Card stack) still wins */
-:where(.card-block > astro-island > *) {
+:where(.card-block > *) {
   pointer-events: auto;
 }
 

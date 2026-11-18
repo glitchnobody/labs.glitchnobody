@@ -81,7 +81,6 @@ const OPTIONS: DropdownOption[] = [
   { group: "Price", label: "High to low", icon: "ph:trend-down" },
 ];
 const DUR = { Snappy: 220, Smooth: 320, Slow: 480 };
-const ROW = 32;
 const HEAD = 40;
 
 /* keeps the old content beside the new one for 200 ms so CSS can roll them */

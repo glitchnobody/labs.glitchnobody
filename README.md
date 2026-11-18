@@ -1,11 +1,13 @@
 # glitchnobody labs
 
-A wall of interactive React components. Each one opens to a live stage, its settings and its source. Built on Astro.
+A wall of interactive React components. Each one opens to a live stage, its settings and its source. Built on TanStack Start (React, TanStack Router and Query), Tailwind v4, Biome and pnpm.
 
 ```sh
-npm install
-npm run dev      # http://localhost:4321
-npm run build
+pnpm install
+pnpm dev         # http://localhost:3000
+pnpm build       # SSR build into dist/
+pnpm preview     # serve the build
+pnpm check       # Biome
 ```
 
 ## Add a component
@@ -48,11 +50,13 @@ export default {
 | Path | What it is |
 | --- | --- |
 | `src/lab/index.ts` | Builds the registry from every `meta.ts` |
-| `src/components/Wall.astro` | The wall and its filter chips; every page renders it |
+| `src/components/Wall.tsx` | The wall and its filter chips (rendered by `src/routes/_wall.tsx` under `/` and `/$slug`) |
 | `src/components/Block.tsx` | Renders one component by slug |
 | `src/components/Modal.tsx` | Opens a component over the wall; `/slug` is the open state |
 | `src/components/Detail.tsx` | The modal's contents: stage, settings, code view |
-| `src/pages/[slug].json.ts` | Highlighted source and "How it works" notes for the code view |
-| `src/layouts/Layout.astro` | Header, command menu (Ctrl/Cmd K), theme (Alt/Option D), mute |
+| `src/routes/api/code/$slug.ts` | Highlighted source and "How it works" notes for the code view (fetched with TanStack Query) |
+| `src/routes/sounds.tsx` | The sound library page |
+| `src/routes/__root.tsx` | Document, header, command menu (Ctrl/Cmd K), theme (Alt/Option D), mute |
+| `src/styles.css`, `src/site.css` | Root stylesheet (Tailwind theme + utilities, tokens) and the shell's CSS |
 
 Third-party code and its licences are listed in [THIRD_PARTY.md](THIRD_PARTY.md).

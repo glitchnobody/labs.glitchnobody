@@ -121,7 +121,7 @@ type CardProps = {
   sfx: (name: string, vol: number, pitch?: number) => void;
 };
 
-function Card({ i, depth, count, width, height, offset, tilt, threshold, spring, reduced, captions, image, progress, onThrow, register, sfx }: CardProps) {
+function Card({ i, depth, count, width, offset, tilt, threshold, spring, reduced, captions, image, progress, onThrow, register, sfx }: CardProps) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const opacity = useMotionValue(1);

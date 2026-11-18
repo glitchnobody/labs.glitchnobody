@@ -167,7 +167,6 @@ export function StorageDonut({
 
   useEffect(() => {
     if (active === null) return;
-    const el = root.current;
     const off = (e: PointerEvent) => {
       if (e.pointerType === "touch" && !(e.target as Element).closest?.("[data-seg]")) setActive(null);
     };
