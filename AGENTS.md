@@ -64,8 +64,8 @@ Stack (from the TanStack CLI scaffold, `npx @tanstack/cli@latest create … --pa
 ```
 pnpm install
 pnpm dev          # http://localhost:3000 (run it in the background)
-pnpm build        # SSR build into dist/
-pnpm preview      # serve the production build
+pnpm build        # SSR build via Nitro: .output/ locally, .vercel/output/ on Vercel
+node .output/server/index.mjs   # serve the production build
 pnpm check        # Biome lint + format check (pnpm lint / pnpm format)
 ```
 

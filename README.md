@@ -5,8 +5,8 @@ A wall of interactive React components. Each one opens to a live stage, its sett
 ```sh
 pnpm install
 pnpm dev         # http://localhost:3000
-pnpm build       # SSR build into dist/
-pnpm preview     # serve the build
+pnpm build       # SSR build via Nitro (.output/, or .vercel/output/ on Vercel)
+node .output/server/index.mjs   # serve the build
 pnpm check       # Biome
 ```
 
