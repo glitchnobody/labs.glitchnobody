@@ -1,0 +1,39 @@
+.cmn {
+  position: relative;
+  display: block; width: fit-content;
+  overflow: hidden;
+  background: var(--fill-slab);
+  color: var(--fill-on);
+  font-family: var(--font-ui);
+  box-shadow: var(--shadow-float);
+  user-select: none;
+}
+[data-stroke="on"] .cmn { box-shadow: 0 0 0 1px var(--pane-edge); }
+.cmn :where(button) { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.cmn-pill {
+  display: flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 16px; white-space: nowrap;
+  font-size: 14px; font-weight: 500;
+}
+.cmn-label { display: inline-block; font-size: 14px; font-weight: 500; white-space: nowrap; }
+.cmn-plus { display: inline-flex; }
+.cmn-ok { color: var(--ok); }
+.cmn-head {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 44px; padding: 0 12px 0 16px;
+  border-bottom: 1px solid var(--pane-edge);
+}
+.cmn-close { display: inline-flex; padding: 6px; border-radius: 50%; }
+.cmn-grid {
+  display: grid; grid-template-columns: repeat(var(--cmn-cols), 72px);
+  justify-content: start; padding: 8px;
+}
+.cmn-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  height: 64px; border-radius: var(--r-control);
+  font-size: 12px; touch-action: manipulation;
+}
+.cmn-tile .iconify { color: var(--ink-2); }
+.cmn-tile:hover, .cmn-tile:focus-visible { background: color-mix(in srgb, var(--fill-on) 6%, transparent); }
+.cmn :where(button):focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
+.cmn-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }

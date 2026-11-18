@@ -1,0 +1,5 @@
+/* card hit areas: the card padding opens the modal; only the toggle, text and button react */
+.card .pt { pointer-events: none; }
+.card .pt-toggle, .card .pt-cta, .card .pt-head, .card .pt-desc, .card .pt-price, .card .pt-bill, .card .pt-row { pointer-events: auto; }
+/* the card is 420 px tall: shrink it so it clears the wall card's name pill and buttons */
+.card .pt { zoom: 0.8; }

@@ -1,0 +1,243 @@
+/* OTP input: a row of boxes over one transparent input. */
+.otp {
+  --ease-pop: linear(0, 0.4 8%, 0.95 20%, 1.12 32%, 1.04 46%, 0.99 64%, 1);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-ui);
+  color: var(--fill-on);
+  user-select: none;
+}
+
+.otp-row {
+  position: relative;
+  display: flex;
+  gap: 8px;
+}
+
+.otp[data-phase="wrong"] .otp-row {
+  animation: otp-shake 400ms ease-in-out;
+}
+
+.otp-box {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--h);
+  background: var(--fill-slab);
+  border: 1px solid color-mix(in srgb, var(--fill-on) 14%, transparent);
+  border-radius: var(--radius);
+  font-size: calc(var(--size) * 0.45);
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.otp[data-group="true"] .otp-box[data-gap="true"] {
+  margin-left: 8px;
+}
+
+.otp-box[data-filled="true"] {
+  border-color: var(--ink-3);
+}
+
+[data-stroke="on"] .otp-box {
+  box-shadow: 0 0 0 1px var(--pane-edge);
+}
+
+.otp-d {
+  display: grid;
+  place-items: center;
+  animation: otp-pop 180ms var(--ease-pop) var(--dl) both;
+}
+
+.otp-d[data-out="true"] {
+  animation: otp-drop 120ms ease-in var(--dl) both;
+}
+
+.otp-g {
+  display: block;
+}
+
+.otp[data-mask="true"] .otp-d:not([data-out="true"]) .otp-g {
+  animation: otp-hide 200ms ease-in calc(var(--dl) + 600ms) forwards;
+}
+
+.otp[data-mask="true"] .otp-d:not([data-out="true"])::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--fill-on);
+  transform: scale(0);
+  animation: otp-dot 200ms ease-out calc(var(--dl) + 600ms) forwards;
+}
+
+.otp-caret {
+  position: absolute;
+  width: 2px;
+  height: 45%;
+  background: var(--fill-on);
+  animation: otp-blink 1s steps(1) infinite;
+}
+
+.otp-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  width: var(--size);
+  height: var(--h);
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 2px var(--pick);
+  transform: translateX(var(--ring-x));
+  opacity: 0;
+  transition: transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity var(--t-fast) var(--ease);
+  pointer-events: none;
+}
+
+.otp-ring[data-on="true"] {
+  opacity: 1;
+}
+
+.otp-sweep {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.otp-sweep i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 35%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--pick) 10%, transparent) 50%, transparent);
+  animation: otp-sweep var(--delay) linear both;
+}
+
+.otp[data-phase="wrong"] .otp-box,
+.otp[data-phase="clearing"] .otp-box {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.otp[data-phase="right"] .otp-box {
+  border-color: var(--ok);
+  color: var(--ok);
+  transition-delay: calc(var(--i) * 50ms);
+  animation: otp-lift 400ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 50ms) both;
+}
+
+.otp[data-phase="clearing"] .otp-d {
+  animation: otp-drop 120ms ease-in calc(var(--rev) * 30ms) both;
+}
+
+.otp-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 16px;
+  opacity: 0;
+  cursor: text;
+  outline: none;
+}
+
+.otp-status {
+  min-height: 16px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-3);
+}
+
+.otp-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ok);
+}
+
+.otp-resend {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--pick);
+  cursor: pointer;
+}
+
+.otp-resend:hover {
+  text-decoration: underline;
+}
+
+.otp-resend:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.otp-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@keyframes otp-pop {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes otp-drop {
+  to { opacity: 0; transform: translateY(6px); }
+}
+@keyframes otp-hide {
+  to { opacity: 0; transform: scale(0.3); }
+}
+@keyframes otp-dot {
+  to { transform: scale(1); }
+}
+@keyframes otp-blink {
+  50% { opacity: 0; }
+}
+@keyframes otp-shake {
+  0%, 100% { transform: translateX(0); }
+  17%, 50%, 83% { transform: translateX(-6px); }
+  33%, 66% { transform: translateX(6px); }
+}
+@keyframes otp-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+@keyframes otp-lift {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .otp-d,
+  .otp-d[data-out="true"],
+  .otp[data-phase="clearing"] .otp-d,
+  .otp[data-phase="right"] .otp-box {
+    animation: none;
+  }
+  .otp[data-phase="clearing"] .otp-d { opacity: 0; }
+  .otp[data-phase="wrong"] .otp-row,
+  .otp-sweep i {
+    animation: none;
+  }
+  .otp-ring { transition: none; }
+}

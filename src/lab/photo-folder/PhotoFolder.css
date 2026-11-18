@@ -1,0 +1,20 @@
+.phf {
+  --phf-back: color-mix(in srgb, var(--fill-on) 16%, var(--fill-slab)); --phf-pocket: var(--fill-slab);
+  position: relative; width: 220px; height: 140px; outline: none; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.phf[data-style="tinted"] { --phf-back: color-mix(in srgb, var(--pick) 30%, var(--fill-slab)); --phf-pocket: color-mix(in srgb, var(--pick) 18%, var(--fill-slab)); }
+.phf[data-style="dark"] { --phf-back: color-mix(in srgb, var(--fill-on) 80%, var(--fill-slab)); --phf-pocket: color-mix(in srgb, var(--fill-on) 70%, var(--fill-slab)); }
+.phf:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 4px; border-radius: var(--r-panel); }
+.phf-back { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.phf-back path { fill: var(--phf-back); }
+[data-stroke="on"] .phf-back path { stroke: var(--pane-edge); stroke-width: 1; }
+.phf-photo {
+  position: absolute; top: 37px; width: 64px; height: 56px; box-sizing: border-box; border-radius: var(--r-card);
+  border: 2.5px solid var(--fill-slab); box-shadow: 0 1px 4px rgb(0 0 0 / 18%); transform-origin: 50% 90%;
+}
+.phf-pocket {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 84px; border-radius: var(--r-panel);
+  background: var(--phf-pocket);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 45%, transparent), 0 -4px 10px -4px rgb(0 0 0 / 14%), var(--shadow-raised);
+}
+[data-stroke="on"] .phf-pocket { box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 45%, transparent), 0 -4px 10px -4px rgb(0 0 0 / 14%), 0 0 0 1px var(--pane-edge); }

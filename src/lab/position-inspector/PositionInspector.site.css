@@ -1,0 +1,3 @@
+/* card hit areas: the frame and the gaps between panels fall through to the card link */
+.card .psi { pointer-events: none; }
+.card .psi-panel { pointer-events: auto; }

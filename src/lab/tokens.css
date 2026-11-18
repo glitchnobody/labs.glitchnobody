@@ -1,0 +1,191 @@
+/* ── Tokens ────────────────────────────────────────────────
+   The values from DESIGN.md. Components read only the names; the
+   modal's Fill switch sets [data-theme] on the stage, so every block
+   follows light and dark by itself. Light by default; dark under
+   [data-theme="dark"] or with the system setting unless
+   [data-theme="light"] says otherwise. */
+
+/* theme-independent: radius, type, motion */
+:root {
+  --font-ui: "Inter Tight", "Inter", system-ui, "Helvetica Neue", Arial, sans-serif;
+  --font-code: ui-monospace, "JetBrains Mono", Menlo, monospace;
+
+  --r-card: 4px;
+  --r-control: 6px;
+  --r-panel: 10px;
+  --r-pill: 9999px;
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-fast: 150ms;
+  --t-base: 200ms;
+  --t-slow: 280ms;
+}
+
+/* colour and depth, light */
+:root,
+[data-theme="light"] {
+  --bg: #fcfcfc;
+  --card: #f4f4f4;
+  --surface: #f4f4f4;
+  --surface-2: #ececec;
+  --surface-3: #e3e3e3;
+  --fill-slab: #ffffff;
+  --fill-on: #0a0a0a;
+  --fill-on-rgb: 10, 10, 10;
+  --ink: #0a0a0a;
+  --ink-rgb: 10, 10, 10;
+  --ink-2: #404040;
+  --ink-3: #6b6b6b;
+  --ink-4: #a3a3a3;
+  --ink-5: #d4d4d4;
+  --on-ink: #ffffff;
+  --on-ink-rgb: 255, 255, 255;
+  --pane-edge: rgba(0, 0, 0, 0.08);
+  --hairline: rgba(0, 0, 0, 0.05);
+
+  --pick: #3366e0;
+  --focus: #3366e0;
+  --ok: #1e9e5a;
+  --danger: #e04a3a;
+  --warn: #d4892a;
+  --hue-blue: #3366e0;
+  --hue-violet: #7a5ae0;
+  --hue-cyan: #1aa3c4;
+  --hue-green: #2ea866;
+  --hue-orange: #f06a2a;
+  --hue-pink: #d94f9a;
+
+  --shadow-raised: 0 0 0 0.5px rgba(0, 0, 0, 0.125), 0 1px 1px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-float: 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.06), 0 16px 40px rgba(0, 0, 0, 0.1);
+  --stage-edge: inset 0 0 0 0.5px rgba(0, 0, 0, 0.075);
+
+  /* legacy names, re-pointed */
+  --board: #ffffff;
+  --slab: #0a0a0a;
+  --on-slab: #ffffff;
+  --slab-dark: #000000;
+  --inlay: rgba(255, 255, 255, 0.55);
+  --inlay-hi: rgba(0, 0, 0, 0.09);
+  --pane-thumb: rgba(0, 0, 0, 0.07);
+  --elev-rgb: 255, 255, 255;
+  --glass-rgb: 255, 255, 255;
+  --shadow-rgb: 0, 0, 0;
+  --wash: 0.06;
+  --signal: #3366e0;
+  color-scheme: light;
+}
+
+/* named again wherever the theme is set, so they resolve per theme */
+:root,
+[data-theme] {
+  --pick-soft: color-mix(in srgb, var(--pick) 12%, var(--fill-slab));
+  --ember: var(--warn);
+  --pane: var(--fill-slab);
+}
+
+[data-theme="dark"] {
+  --bg: #141414;
+  --card: #1b1b1b;
+  --surface: #1b1b1b;
+  --surface-2: #232323;
+  --surface-3: #2b2b2b;
+  --fill-slab: #222222;
+  --fill-on: #f2f2f2;
+  --fill-on-rgb: 242, 242, 242;
+  --ink: #f2f2f2;
+  --ink-rgb: 242, 242, 242;
+  --ink-2: #c2c2c2;
+  --ink-3: #8f8f8f;
+  --ink-4: #636363;
+  --ink-5: #3a3a3a;
+  --on-ink: #0a0a0a;
+  --on-ink-rgb: 10, 10, 10;
+  --pane-edge: rgba(255, 255, 255, 0.08);
+  --hairline: rgba(255, 255, 255, 0.06);
+
+  --pick: #5c8bff;
+  --focus: #5c8bff;
+  --ok: #3fcf86;
+  --danger: #ff6d5e;
+  --warn: #f0a650;
+  --hue-blue: #5c8bff;
+  --hue-violet: #9d85ff;
+  --hue-cyan: #3cc6e6;
+  --hue-green: #4fd28b;
+  --hue-orange: #ff8a4f;
+  --hue-pink: #f27bbd;
+
+  --shadow-raised: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.5);
+  --stage-edge: inset 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+
+  /* legacy names, re-pointed */
+  --board: #1b1b1b;
+  --slab: #1b1b1b;
+  --on-slab: #f2f2f2;
+  --slab-dark: #2b2b2b;
+  --inlay: rgba(255, 255, 255, 0.1);
+  --inlay-hi: rgba(255, 255, 255, 0.09);
+  --pane-thumb: rgba(255, 255, 255, 0.07);
+  --elev-rgb: 34, 34, 34;
+  --glass-rgb: 34, 34, 34;
+  --shadow-rgb: 0, 0, 0;
+  --wash: 0.09;
+  --signal: #5c8bff;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141414;
+    --card: #1b1b1b;
+    --surface: #1b1b1b;
+    --surface-2: #232323;
+    --surface-3: #2b2b2b;
+    --fill-slab: #222222;
+    --fill-on: #f2f2f2;
+    --fill-on-rgb: 242, 242, 242;
+    --ink: #f2f2f2;
+    --ink-rgb: 242, 242, 242;
+    --ink-2: #c2c2c2;
+    --ink-3: #8f8f8f;
+    --ink-4: #636363;
+    --ink-5: #3a3a3a;
+    --on-ink: #0a0a0a;
+    --on-ink-rgb: 10, 10, 10;
+    --pane-edge: rgba(255, 255, 255, 0.08);
+    --hairline: rgba(255, 255, 255, 0.06);
+
+    --pick: #5c8bff;
+    --focus: #5c8bff;
+    --ok: #3fcf86;
+    --danger: #ff6d5e;
+    --warn: #f0a650;
+    --hue-blue: #5c8bff;
+    --hue-violet: #9d85ff;
+    --hue-cyan: #3cc6e6;
+    --hue-green: #4fd28b;
+    --hue-orange: #ff8a4f;
+    --hue-pink: #f27bbd;
+
+    --shadow-raised: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-float: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.5);
+    --stage-edge: inset 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+
+    /* legacy names, re-pointed */
+    --board: #1b1b1b;
+    --slab: #1b1b1b;
+    --on-slab: #f2f2f2;
+    --slab-dark: #2b2b2b;
+    --inlay: rgba(255, 255, 255, 0.1);
+    --inlay-hi: rgba(255, 255, 255, 0.09);
+    --pane-thumb: rgba(255, 255, 255, 0.07);
+    --elev-rgb: 34, 34, 34;
+    --glass-rgb: 34, 34, 34;
+    --shadow-rgb: 0, 0, 0;
+    --wash: 0.09;
+    --signal: #5c8bff;
+    color-scheme: dark;
+  }
+}

@@ -1,0 +1,46 @@
+import type { Meta } from "..";
+import "./SetStatus.css";
+import "./SetStatus.site.css";
+
+export default {
+  name: "Set status",
+  description: "A pill that pops up a row of emoji statuses. Hover one to read it in a thought bubble, press it to send it into the pill, and press the cross to clear it.",
+  tag: "Select",
+  install: "npm install @iconify/react",
+  sounds: ["expand", "collapse", "tick", "pop"],
+  demo: [
+    { move: [0.5, 1.8], ms: 0 },
+    { move: [0.5, 0.5], ms: 500 },
+    { down: true },
+    { up: true },
+    { wait: 500 },
+    { move: [-0.19, -0.89], ms: 400 },
+    { move: [0.153, -0.89], ms: 350 },
+    { move: [0.5, -0.89], ms: 350 },
+    { move: [0.847, -0.89], ms: 350 },
+    { down: true },
+    { up: true },
+    { wait: 1000 },
+    { move: [0.9, 0.5], ms: 500 },
+    { down: true },
+    { up: true },
+    { wait: 400 },
+    { move: [0.5, 1.8], ms: 500 },
+  ],
+  knobs: [
+    { prop: "set", label: "Option set", type: "select", options: ["Work", "Mood", "Travel"], default: "Work" },
+    { prop: "count", label: "Options", type: "range", min: 3, max: 7, default: 5 },
+    { prop: "buttonLabel", label: "Button", type: "text", maxLength: 20, default: "Set Status" },
+    { prop: "showLabel", label: "Label in pill", type: "toggle", default: true },
+    { prop: "bubble", label: "Thought bubble", type: "toggle", default: true },
+    { prop: "direction", label: "Open", type: "select", options: ["Up", "Down"], default: "Up" },
+    { prop: "size", label: "Option size (px)", type: "range", min: 40, max: 80, default: 60 },
+    { prop: "gap", label: "Gap (px)", type: "range", min: 0, max: 20, default: 8 },
+    { prop: "stagger", label: "Stagger (ms)", type: "range", min: 0, max: 80, step: 5, default: 30 },
+    { prop: "bounce", label: "Bounce", type: "range", min: 0, max: 100, default: 40 },
+    { prop: "hoverOpen", label: "Open on hover", type: "toggle", default: false },
+    { prop: "sound", label: "Sound", type: "toggle", default: true },
+    { prop: "volume", label: "Volume", type: "range", min: 0, max: 100, default: 70 },
+  ],
+  load: () => import("./SetStatus").then((m) => m.SetStatus),
+} satisfies Meta;

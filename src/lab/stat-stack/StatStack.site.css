@@ -1,0 +1,3 @@
+/* card hit areas: the gap between tiles falls through to the card link */
+.card .skx { pointer-events: none; }
+.card .skx-tile { pointer-events: auto; }

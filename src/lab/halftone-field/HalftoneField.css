@@ -1,0 +1,7 @@
+.htf {
+  width: var(--htf-w); height: var(--htf-h); box-sizing: content-box; border-radius: var(--r-panel); overflow: hidden;
+  background: var(--fill-slab); box-shadow: 0 0 0 1px var(--pane-edge);
+}
+.htf[data-inverted="true"] { background: var(--fill-on); }
+.htf-cv { display: block; width: 100%; height: 100%; touch-action: pan-y; outline: none; cursor: crosshair; }
+.htf:has(.htf-cv:focus-visible) { box-shadow: 0 0 0 1px var(--pane-edge), 0 0 0 3px var(--focus); }

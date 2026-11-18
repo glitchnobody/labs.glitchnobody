@@ -1,0 +1,195 @@
+/* Input box: a field with a floating label, a drawn focus ring and live rules. */
+.ibx {
+  --spring: linear(0, 0.4 8%, 0.95 20%, 1.1 32%, 1.03 46%, 1);
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  width: var(--w);
+  padding-top: 8px;
+  font-family: var(--font-ui);
+  color: var(--fill-on);
+  user-select: none;
+}
+
+.ibx-field {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: var(--w);
+  height: var(--h);
+  padding-right: 10px;
+  background: var(--fill-slab);
+  border: 1px solid color-mix(in srgb, var(--fill-on) 16%, transparent);
+  border-radius: var(--r);
+  cursor: text;
+  transition: border-color var(--t-fast) var(--ease);
+}
+[data-stroke="on"] .ibx-field {
+  border-color: var(--pane-edge);
+}
+
+.ibx-ring {
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  overflow: visible;
+  pointer-events: none;
+}
+.ibx-ring path {
+  fill: none;
+  stroke: var(--pick);
+  stroke-width: 2;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset calc(var(--ring) / 2) ease-in;
+}
+.ibx-ring path[data-on="true"] {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--ring) cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ibx-field[data-invalid="true"] .ibx-ring path {
+  stroke: var(--danger);
+}
+
+.ibx-label {
+  position: absolute;
+  left: var(--gx);
+  top: -1px;
+  padding: 0 4px;
+  background: var(--fill-slab);
+  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform-origin: left center;
+  transform: translateY(calc(var(--h) / 2 - 8px));
+  transition: transform 180ms var(--spring), color var(--t-fast) var(--ease);
+}
+.ibx-label[data-up="true"] {
+  transform: translateY(-8px) scale(0.857);
+}
+.ibx-label[data-focus="true"] {
+  color: var(--pick);
+}
+
+.ibx-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0 0 var(--px);
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--fill-on);
+  font: inherit;
+  font-size: var(--fs);
+  user-select: text;
+  transition: transform 120ms var(--ease), opacity 120ms var(--ease);
+}
+.ibx-input[data-fading="true"] {
+  transform: translateX(-10px);
+  opacity: 0;
+}
+
+.ibx-side {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-4);
+}
+.ibx-ok { color: var(--ok); }
+.ibx-bad { color: var(--danger); }
+.ibx-spin { animation: ibx-spin 800ms linear infinite; }
+
+.ibx-count {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+}
+.ibx-count svg { position: absolute; transform: rotate(-90deg); }
+.ibx-count circle { fill: none; stroke-width: 2; }
+.ibx-track { stroke: color-mix(in srgb, var(--ink-3) 15%, transparent); }
+.ibx-arc { stroke: var(--fill-on); transition: stroke-dashoffset 120ms var(--ease), stroke var(--t-fast) var(--ease); }
+.ibx-count[data-full="true"] .ibx-arc { stroke: var(--danger); }
+.ibx-count[data-shake="true"] { animation: ibx-shake 240ms ease-in-out; }
+.ibx-count b {
+  position: relative;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+.ibx-count[data-full="true"] b { color: var(--danger); }
+
+.ibx-clear {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: color var(--t-fast) var(--ease);
+}
+.ibx-clear:hover { color: var(--ink-2); }
+
+.ibx-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0 0 0 2px;
+  list-style: none;
+  font-size: 12px;
+  line-height: 16px;
+}
+.ibx-rules li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-4);
+  transition: color var(--t-fast) var(--ease);
+}
+.ibx-rules li[data-state="ok"] { color: var(--ok); }
+.ibx-rules li[data-state="bad"] { color: var(--danger); }
+.ibx-dot {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+li:not([data-state="idle"]) .ibx-dot { border-color: transparent; }
+.ibx-dot svg { animation: ibx-draw 160ms ease-out; }
+
+.ibx-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@keyframes ibx-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+@keyframes ibx-spin { to { transform: rotate(360deg); } }
+@keyframes ibx-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ibx-ring path,
+  .ibx-ring path[data-on="true"],
+  .ibx-label,
+  .ibx-input { transition: none; }
+  .ibx-dot svg,
+  .ibx-count { animation: none; }
+}

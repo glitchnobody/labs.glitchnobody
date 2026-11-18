@@ -1,0 +1,3 @@
+/* card hit areas: only the track reacts, the lane above and the sides fall through to the card link */
+.card .ss { pointer-events: none; }
+.card .ss-track { pointer-events: auto; }

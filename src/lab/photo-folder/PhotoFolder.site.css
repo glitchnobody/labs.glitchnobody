@@ -1,0 +1,3 @@
+/* card hit areas: only the folder shape and photos react, not the empty corner beside the tab */
+.card .phf, .card .phf-back { pointer-events: none; }
+.card .phf-back path, .card .phf-photo, .card .phf-pocket { pointer-events: auto; }

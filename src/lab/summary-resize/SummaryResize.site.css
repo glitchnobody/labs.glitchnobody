@@ -1,0 +1,3 @@
+/* card hit areas: only the card, its handle and the ruler stops react */
+.card .smz { pointer-events: none; }
+.card .smz-card, .card .smz-stop { pointer-events: auto; }

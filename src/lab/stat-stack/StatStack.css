@@ -1,0 +1,45 @@
+.skx { display: flex; flex-direction: column; gap: 10px; width: 340px; font-family: var(--font-ui); }
+.skx-tile {
+  position: relative; display: flex; height: var(--sks-h); box-sizing: border-box; width: 340px;
+  border-radius: var(--sks-r); background: var(--fill-slab); border: 1px solid var(--pane-edge);
+  box-shadow: var(--shadow-raised); color: var(--fill-on);
+  transition: height 200ms, outline-color 120ms; outline: 1.5px solid transparent; outline-offset: 3px;
+}
+.skx[data-ring="on"] .skx-tile:hover, .skx[data-ring="on"] .skx-tile:focus-within { outline-color: var(--fill-on); }
+[data-stroke="on"] .skx-tile { border-color: var(--ink-4); }
+.skx-stats { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; padding: 16px 0 12px 16px; }
+.skx-name { font-size: 13px; line-height: 16px; color: var(--ink-3); }
+.skx-val { display: flex; align-items: baseline; gap: 6px; font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: -4px; }
+.skx-chg { font-size: 13px; font-weight: 400; color: var(--danger); }
+.skx-chg[data-up="true"] { color: var(--ok); }
+.skx-per { font: inherit; font-size: 12px; color: var(--ink-4); background: none; border: 0; padding: 0; cursor: pointer; user-select: none; border-radius: var(--r-control); }
+.skx-per:hover { color: var(--ink-2); }
+.skx-per:focus-visible, .skx-chart:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
+.skx-roll { display: inline-flex; }
+.skx-dig { display: inline-block; height: 24px; line-height: 24px; overflow: hidden; }
+.skx-dig > span { display: flex; flex-direction: column; transition-property: transform; transition-timing-function: cubic-bezier(.2,.7,.2,1); }
+.skx-dig > span > span { height: 24px; }
+.skx-chart {
+  position: relative; box-sizing: border-box; width: 187px; margin: 5px 5px 5px 0; flex: none; touch-action: pan-y; user-select: none; cursor: crosshair;
+  border-radius: calc(var(--sks-r) - 4px); border: 1px solid var(--pane-edge);
+  background: color-mix(in srgb, var(--fill-on) 5%, var(--fill-slab));
+}
+.skx-chart svg { display: block; overflow: hidden; border-radius: inherit; }
+.skx-line { fill: none; stroke: var(--fill-on); stroke-width: 1.5; stroke-linejoin: round; }
+.skx-fill { fill: color-mix(in srgb, var(--fill-on) 8%, transparent); stroke: none; }
+.skx-fill[data-area="true"] { fill: color-mix(in srgb, var(--fill-on) 14%, transparent); }
+.skx-bar { fill: color-mix(in srgb, var(--fill-on) 14%, transparent); }
+.skx-cap { fill: var(--fill-on); }
+g[data-hot="true"] .skx-bar { fill: color-mix(in srgb, var(--fill-on) 40%, transparent); }
+.skx-mark { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 3; }
+.skx-dot { fill: var(--fill-on); stroke: var(--fill-slab); stroke-width: 1.5; }
+.skx-tip {
+  position: absolute; z-index: 1; pointer-events: none; display: flex; flex-direction: column; gap: 1px; white-space: nowrap;
+  padding: 4px 8px; border-radius: var(--r-control); background: var(--fill-on); color: var(--fill-slab); box-shadow: var(--shadow-float);
+  font-size: 13px; font-variant-numeric: tabular-nums;
+}
+.skx-tip b { font-weight: 500; }
+.skx-tip-d { font-size: 11px; opacity: .7; }
+.skx-tip-m { font-size: 11px; opacity: .7; }
+.skx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (prefers-reduced-motion: reduce) { .skx-tile, .skx-dig > span { transition: none; } }

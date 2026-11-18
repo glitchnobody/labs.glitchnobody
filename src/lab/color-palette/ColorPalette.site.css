@@ -1,0 +1,3 @@
+/* card hit areas: only the tile reacts on the wall */
+.card .cp { pointer-events: none; }
+.card .cp-tile { pointer-events: auto; }

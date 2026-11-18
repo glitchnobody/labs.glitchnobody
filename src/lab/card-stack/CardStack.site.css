@@ -1,0 +1,7 @@
+/* card hit areas: only the top card reacts on the wall */
+.card .cst {
+  pointer-events: none;
+}
+.card .cst-card[data-top] {
+  pointer-events: auto;
+}

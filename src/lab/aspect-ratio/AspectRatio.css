@@ -1,0 +1,241 @@
+/* Aspect ratio: a photo stage, a title and a four-button tile, 220 px wide. */
+.ar {
+  --bounce-ease: 0s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 220px;
+  font-family: var(--font-ui);
+  color: var(--fill-on);
+  user-select: none;
+}
+
+.ar-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 160px;
+}
+
+.ar-photo {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--r-card);
+  background: var(--surface-2);
+  transition: width var(--bounce-ease), height var(--bounce-ease);
+}
+
+.ar-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+
+/* a landscape from two hues: sky, sun and a ground, always the stage size, centred, so the photo crops it */
+.ar-art {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 220px;
+  height: 160px;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at 70% 38%, hsl(calc(var(--a) + 40) 90% 85%) 0 9%, transparent 10%),
+    linear-gradient(to bottom, transparent 58%, hsl(var(--b) 45% 38%) 58%, hsl(var(--b) 50% 24%)),
+    linear-gradient(to bottom, hsl(var(--a) 65% 55%), hsl(calc(var(--a) + 30) 75% 78%) 58%);
+}
+
+.ar-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-base) var(--ease);
+}
+
+.ar[data-busy] .ar-grid,
+.ar-photo:hover .ar-grid {
+  opacity: 1;
+}
+
+.ar-line {
+  position: absolute;
+  background: color-mix(in srgb, white 55%, transparent);
+  box-shadow: 0 0 2px color-mix(in srgb, black 30%, transparent);
+}
+
+.ar-v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.ar-h {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.ar-title {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: var(--fill-on);
+}
+
+.ar-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 220px;
+  height: 56px;
+  margin-top: 8px;
+  padding: 0 14px;
+  border-radius: var(--r-panel);
+  background: color-mix(in srgb, var(--fill-on) 9%, var(--fill-slab));
+}
+
+[data-stroke="on"] .ar-tile {
+  box-shadow: 0 0 0 1px var(--pane-edge);
+}
+
+.ar-radios {
+  display: contents;
+}
+
+/* the highlight: four slots, spaced like the buttons */
+.ar-mark {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-control);
+  background: color-mix(in srgb, var(--fill-on) 14%, transparent);
+  transform: translateX(calc(var(--i) * (192px - 32px) / 3));
+  transition: transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  pointer-events: none;
+}
+
+.ar[data-reduced] .ar-mark {
+  transition: none;
+}
+
+.ar-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--t-fast) var(--ease);
+}
+
+.ar-btn:hover,
+.ar-btn[data-on] {
+  color: var(--fill-on);
+}
+
+.ar-btn:focus-visible,
+.ar-item:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.ar-label {
+  align-self: flex-end;
+  height: 14px;
+  margin: 4px 14px 0 0;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.ar-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 96px;
+  padding: 4px;
+  border-radius: var(--r-panel);
+  background: var(--fill-slab);
+  box-shadow: var(--shadow-float);
+  transform-origin: bottom right;
+  animation: ar-pop 140ms var(--ease-out);
+}
+
+[data-stroke="on"] .ar-menu {
+  box-shadow: var(--shadow-float), 0 0 0 1px var(--pane-edge);
+}
+
+@keyframes ar-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.ar-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--fill-on);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--t-fast) var(--ease);
+}
+
+.ar-item:hover,
+.ar-item:focus-visible {
+  background: var(--surface-2);
+}
+
+.ar-item svg {
+  color: var(--pick);
+}
+
+.ar-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-menu {
+    animation: none;
+  }
+}

@@ -1,0 +1,3 @@
+/* card hit areas: only the pill reacts; the space around it opens the modal */
+.card .nm { pointer-events: none; }
+.card .nm-pill { pointer-events: auto; }

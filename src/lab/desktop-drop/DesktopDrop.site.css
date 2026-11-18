@@ -1,0 +1,4 @@
+/* card hit areas: only the folder and files react */
+.card .dsk { pointer-events: none; }
+.card .dsk-folder, .card .dsk-file { pointer-events: auto; }
+.card .dsk-file[data-in="true"] { pointer-events: none; }

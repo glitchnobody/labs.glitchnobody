@@ -1,0 +1,43 @@
+import type { Meta } from "..";
+import "./InvitesInbox.css";
+
+export default {
+  name: "Invites inbox",
+  description: "An invites pill with a live count. Open it, accept or decline invites row by row, and watch the badge count down to All caught up.",
+  tag: "Press",
+  install: "npm install @iconify/react",
+  sounds: ["expand", "collapse", "join", "swipe", "tick"],
+  demo: [
+    { move: [1.3, 0.5], ms: 0 },
+    { move: [0.5, 0.5], ms: 500 },
+    { down: true },
+    { up: true },
+    { wait: 1000 },
+    { move: [0.4, 0.245], ms: 400 },
+    { move: [0.73, 0.245], ms: 200 },
+    { down: true },
+    { up: true },
+    { wait: 900 },
+    { move: [0.4, 0.31], ms: 400 },
+    { move: [0.87, 0.31], ms: 200 },
+    { down: true },
+    { up: true },
+    { wait: 800 },
+    { move: [0.9, 0.14], ms: 400 },
+    { down: true },
+    { up: true },
+    { wait: 700 },
+    { move: [1.3, 0.5], ms: 500 },
+  ],
+  knobs: [
+    { prop: "count", label: "Invites", type: "range", min: 1, max: 6, default: 4 },
+    { prop: "unread", label: "Unread", type: "range", min: 0, max: 6, default: 2 },
+    { prop: "blur", label: "Blur (px)", type: "range", min: 0, max: 20, default: 10 },
+    { prop: "speed", label: "Speed", type: "range", min: 0, max: 100, default: 60 },
+    { prop: "refill", label: "Auto refill", type: "toggle", default: true },
+    { prop: "badge", label: "Badge", type: "select", options: ["Number", "Dot", "None"], default: "Number" },
+    { prop: "sound", label: "Sound", type: "toggle", default: true },
+    { prop: "volume", label: "Volume", type: "range", min: 0, max: 100, default: 70 },
+  ],
+  load: () => import("./InvitesInbox").then((m) => m.InvitesInbox),
+} satisfies Meta;

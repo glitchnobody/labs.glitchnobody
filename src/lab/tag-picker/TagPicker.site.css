@@ -1,0 +1,3 @@
+/* card hit areas: the label falls through to the card link */
+.card .tgp { pointer-events: none; }
+.card .tgp-field, .card .tgp-avail { pointer-events: auto; }

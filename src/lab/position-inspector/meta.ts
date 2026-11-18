@@ -1,0 +1,47 @@
+import type { Meta } from "..";
+import "./PositionInspector.css";
+import "./PositionInspector.site.css";
+
+export default {
+  name: "Position inspector",
+  description: "A design tool's position panel wired to a little artboard. Press align to spring the shape to an edge, drag the X, Y or angle label to scrub, or click a value to type.",
+  tag: "Drag",
+  install: "npm install @iconify/react",
+  sounds: ["tick", "expand", "collapse"],
+  demo: [
+    { move: [1.0, 0.45], ms: 0 },
+    { move: [0.208, 0.489], ms: 500 },
+    { down: true },
+    { up: true },
+    { wait: 700 },
+    { move: [0.062, 0.719], ms: 500 },
+    { down: true },
+    { move: [-0.114, 0.719], ms: 900 },
+    { up: true },
+    { move: [0.725, 0.719], ms: 400 },
+    { down: true },
+    { move: [0.74, 0.719], ms: 500 },
+    { up: true },
+    { move: [0.132, 0.489], ms: 500 },
+    { down: true },
+    { up: true },
+    { wait: 600 },
+    { move: [0.725, 0.719], ms: 300 },
+    { down: true },
+    { move: [0.71, 0.719], ms: 300 },
+    { up: true },
+    { move: [1.0, 0.6], ms: 500 },
+  ],
+  knobs: [
+    { prop: "frame", label: "Preview frame", type: "toggle", default: true },
+    { prop: "shape", label: "Shape", type: "select", options: ["Rectangle", "Circle", "Text"], default: "Rectangle" },
+    { prop: "bounce", label: "Bounce", type: "range", min: 0, max: 100, default: 30 },
+    { prop: "snap", label: "Snap", type: "toggle", default: true },
+    { prop: "sensitivity", label: "Scrub (units/px)", type: "range", min: 1, max: 10, default: 4 },
+    { prop: "density", label: "Density", type: "select", options: ["Comfortable", "Compact"], default: "Comfortable" },
+    { prop: "accent", label: "Accent", type: "select", options: ["Pick", "Ink"], default: "Pick" },
+    { prop: "sound", label: "Sound", type: "toggle", default: true },
+    { prop: "volume", label: "Volume", type: "range", min: 0, max: 100, default: 70 },
+  ],
+  load: () => import("./PositionInspector").then((m) => m.PositionInspector),
+} satisfies Meta;

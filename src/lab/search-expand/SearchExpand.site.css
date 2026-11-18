@@ -1,0 +1,3 @@
+/* card hit areas: only the field and panel react; the gap between them opens the modal */
+.card .sx { pointer-events: none; }
+.card .sx-field, .card .sx[data-open] .sx-panel { pointer-events: auto; }

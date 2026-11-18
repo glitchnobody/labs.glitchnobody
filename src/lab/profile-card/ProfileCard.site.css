@@ -1,0 +1,2 @@
+/* card hit areas: shrink to fit the wall card, clear of the name and buttons */
+.card .pfc { scale: 0.74; }

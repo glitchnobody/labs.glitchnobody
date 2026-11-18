@@ -1,0 +1,37 @@
+.tgp { display: flex; flex-direction: column; gap: 6px; width: 280px; font-family: var(--font-ui); color: var(--fill-on); }
+.tgp-label { font-size: 12px; line-height: 16px; font-weight: 500; }
+.tgp-field {
+  position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 40px; padding: 6px; box-sizing: border-box;
+  border-radius: var(--r-panel); background: var(--fill-slab); box-shadow: var(--shadow-raised); cursor: text;
+}
+[data-theme="dark"] .tgp-field { box-shadow: 0 0 0 1px var(--pane-edge); }
+[data-stroke="on"] .tgp-field { box-shadow: var(--shadow-raised), 0 0 0 1px var(--pane-edge); }
+.tgp-field:focus-within { box-shadow: var(--shadow-raised), 0 0 0 1.5px var(--focus); }
+.tgp-sel, .tgp-avail { display: contents; margin: 0; padding: 0; list-style: none; }
+.tgp-avail {
+  display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: var(--r-panel); min-height: 42px; box-sizing: border-box;
+  background: color-mix(in srgb, var(--fill-on) 3%, var(--fill-slab)); box-shadow: 0 0 0 1px var(--pane-edge); transition: opacity 200ms;
+}
+.tgp[data-full="true"] .tgp-avail { opacity: .5; }
+.tgp-tag {
+  position: relative; display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 10px; box-sizing: border-box; border-radius: var(--r-pill);
+  font-size: 12px; font-weight: 500; white-space: nowrap; user-select: none; cursor: pointer; color: var(--ink-3);
+  box-shadow: inset 0 0 0 1px var(--pane-edge); background: var(--fill-slab);
+}
+.tgp-tag:hover { color: var(--fill-on); }
+.tgp-tag[data-hi="true"] { box-shadow: inset 0 0 0 1.5px var(--focus); color: var(--fill-on); }
+.tgp-tag[data-on] { padding-right: 4px; color: var(--fill-on); background: color-mix(in srgb, var(--fill-on) 7%, var(--fill-slab)); box-shadow: none; cursor: grab; touch-action: none; }
+.tgp-tag[data-on]:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 1px; }
+.tgp[data-look="square"] .tgp-tag { border-radius: var(--r-control); }
+.tgp[data-look="outline"] .tgp-tag { background: transparent; }
+.tgp[data-look="outline"] .tgp-tag[data-on] { box-shadow: inset 0 0 0 1px var(--fill-on); background: var(--fill-slab); }
+.tgp-tag[data-shake="true"] > span { animation: tgp-shake 300ms; display: inline-block; }
+@keyframes tgp-shake { 20% { transform: translateX(-3px); } 40% { transform: translateX(3px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
+.tgp-x { display: grid; place-items: center; width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--ink-4); cursor: pointer; }
+.tgp-x:hover { color: var(--fill-on); background: color-mix(in srgb, var(--fill-on) 10%, transparent); }
+.tgp-x:focus-visible { outline: 1.5px solid var(--focus); }
+.tgp-in { flex: 1; min-width: 72px; height: 26px; padding: 0 4px; border: 0; outline: none; background: none; font: inherit; font-size: 12px; color: var(--fill-on); }
+.tgp-in::placeholder { color: var(--ink-4); }
+.tgp-max { font-size: 11px; color: var(--ink-4); padding-right: 4px; }
+.tgp-empty { font-size: 12px; color: var(--ink-4); line-height: 26px; padding: 0 4px; }
+.tgp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }

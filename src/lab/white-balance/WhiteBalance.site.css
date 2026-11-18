@@ -1,0 +1,3 @@
+/* card hit areas: only the tile reacts; photo and title fall through to the card link */
+.card .wbl { pointer-events: none; }
+.card .wbl-tile { pointer-events: auto; }

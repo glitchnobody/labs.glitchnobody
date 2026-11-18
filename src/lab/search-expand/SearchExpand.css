@@ -1,0 +1,60 @@
+.sx { position: relative; display: inline-flex; flex-direction: column; align-items: center; font-family: var(--font-ui); color: var(--fill-on); }
+.sx-field {
+  position: relative; display: flex; align-items: center; height: 40px; width: 40px; overflow: hidden;
+  border-radius: var(--r-pill); background: var(--fill-slab); box-shadow: var(--shadow-raised);
+  transition: width 560ms linear(0, 0.35 10%, 0.8 24%, 1.04 40%, 1.03 52%, 1 70%, 1), background-color 200ms;
+}
+.sx[data-open] .sx-field { width: 240px; background: color-mix(in srgb, var(--fill-on) 5%, var(--fill-slab)); box-shadow: inset 0 1px 2px color-mix(in srgb, var(--fill-on) 12%, transparent); }
+.sx-icon, .sx-clear { all: unset; box-sizing: border-box; flex: none; display: grid; place-items: center; width: 40px; height: 40px; cursor: pointer; border-radius: var(--r-pill); }
+.sx-icon:focus-visible, .sx-clear:focus-visible { outline: 1.5px solid var(--focus); outline-offset: -4px; }
+.sx-ph { width: 16px; height: 16px; }
+.sx-input {
+  all: unset; box-sizing: border-box; flex: 1; min-width: 0; margin-left: -8px; font-size: 13px; color: var(--fill-on);
+  opacity: 0; transition: opacity 160ms;
+}
+.sx[data-open] .sx-input { opacity: 1; transition-delay: 120ms; }
+.sx-input::placeholder { color: var(--ink-4); }
+.sx-clear { color: var(--ink-3); opacity: 0; pointer-events: none; transition: opacity 160ms; }
+.sx[data-open] .sx-clear { opacity: 1; pointer-events: auto; transition-delay: 120ms; }
+.sx-clear:hover { color: var(--fill-on); }
+
+.sx-panel {
+  width: 0; min-width: 100%; margin-top: 0; overflow: hidden; box-sizing: border-box; padding: 0 4px;
+  border-radius: var(--r-panel); background: var(--fill-slab); box-shadow: var(--shadow-float);
+  opacity: 0; transform: translateY(-6px); pointer-events: none;
+  transition: height 260ms cubic-bezier(.2, .8, .2, 1), opacity 200ms, transform 260ms cubic-bezier(.2, .8, .2, 1), margin-top 260ms;
+}
+.sx[data-open] .sx-panel { margin-top: 6px; opacity: 1; transform: none; pointer-events: auto; padding: 4px; }
+.sx-list { position: relative; transition: height 260ms cubic-bezier(.2, .8, .2, 1); }
+.sx-hl {
+  position: absolute; inset: 0 0 auto 0; height: 30px; border-radius: var(--r-control);
+  background: color-mix(in srgb, var(--fill-on) 7%, transparent); transition: transform 180ms cubic-bezier(.2, .8, .2, 1);
+}
+.sx-row {
+  position: absolute; left: 0; right: 0; top: 0; height: 30px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; cursor: pointer; user-select: none; white-space: nowrap;
+  transition: transform var(--sx-dur) cubic-bezier(.2, .8, .2, 1);
+  animation: sx-in 280ms both;
+}
+.sx-row[data-fresh] { animation-name: sx-drop; }
+.sx-row[data-ghost] { animation: sx-out 340ms both; pointer-events: none; }
+.sx-none { color: var(--ink-4); cursor: default; }
+.sx-name { overflow: hidden; text-overflow: ellipsis; }
+.sx-name[data-typed] { color: var(--ink-3); }
+.sx-name [data-hit] { color: var(--fill-on); font-weight: 500; }
+.sx-tag { font-size: 11px; color: var(--ink-4); margin-left: 8px; }
+.sx-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+@keyframes sx-in { from { opacity: 0; filter: blur(var(--sx-blur)); } to { opacity: 1; filter: blur(0); } }
+@keyframes sx-drop { from { opacity: 0; filter: blur(var(--sx-blur)); translate: 0 6px; } to { opacity: 1; filter: blur(0); translate: 0 0; } }
+@keyframes sx-out { from { opacity: 1; filter: blur(0); } to { opacity: 0; filter: blur(var(--sx-blur)); } }
+
+[data-stroke="on"] .sx-field, [data-stroke="on"] .sx-panel { box-shadow: 0 0 0 1px var(--pane-edge); }
+[data-stroke="on"] .sx[data-open] .sx-field { box-shadow: 0 0 0 1px var(--pane-edge), inset 0 1px 2px color-mix(in srgb, var(--fill-on) 12%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sx-field, .sx-panel, .sx-list, .sx-hl, .sx-row { transition: none; }
+  .sx-row, .sx-row[data-fresh], .sx-row[data-ghost] { animation-name: sx-fade; animation-duration: 160ms; }
+  @keyframes sx-fade { from { opacity: 0; } to { opacity: 1; } }
+  .sx-row[data-ghost] { animation: none; opacity: 0; }
+}

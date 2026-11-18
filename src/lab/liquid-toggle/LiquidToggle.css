@@ -1,0 +1,83 @@
+.lqt {
+  position: relative;
+  display: block;
+  width: var(--lqt-w);
+  height: var(--lqt-h);
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: width 0.25s, height 0.25s;
+}
+
+.lqt:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* the blurred gradient: soft inside, spilling past the pill as a glow */
+.lqt-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--lqt-grad);
+  filter: blur(var(--lqt-blur));
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* the pill keeps its shape: the same blurred gradient, clipped, oversized so its ends stay saturated */
+.lqt-body {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.lqt-body::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(var(--lqt-blur) * -2);
+  /* end colours held flat over the overhang, so the visible part matches the sharp gradient */
+  background: linear-gradient(90deg, var(--lqt-c1) calc(var(--lqt-blur) * 2), var(--lqt-c2), var(--lqt-c3) calc(100% - var(--lqt-blur) * 2));
+  filter: blur(var(--lqt-blur));
+}
+
+.lqt-lens {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  height: var(--lqt-d);
+  width: var(--lqt-d);
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  box-shadow: 0 0 0 1px color-mix(in srgb, black 22%, transparent);
+  pointer-events: none;
+  will-change: transform, width;
+}
+
+/* the sharp copy, as wide as the track and shifted back by the lens offset */
+.lqt-sharp {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: var(--lqt-w);
+  height: var(--lqt-h);
+  background: var(--lqt-grad);
+}
+
+/* white ring and a faint inner shadow, over the sharp copy */
+.lqt-lens::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 2px white,
+    inset 0 1px 4px 2px color-mix(in srgb, black 18%, transparent);
+}

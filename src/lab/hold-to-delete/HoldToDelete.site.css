@@ -1,0 +1,8 @@
+/* card hit areas: only the pill (while idle) and Undo react; the ring, chip and gaps open the modal */
+.card .htd {
+  pointer-events: none;
+}
+.card .htd[data-state="idle"] .htd-pill,
+.card .htd[data-state="split"] .htd-undo {
+  pointer-events: auto;
+}

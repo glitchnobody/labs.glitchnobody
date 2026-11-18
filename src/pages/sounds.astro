@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sounds, { type SoundInfo } from '../components/Sounds';
+import { blocks } from '../lab';
+import table from '../../COMPONENTS.md?raw';
+
+/* every sound in public/sounds, described by the sound library table in COMPONENTS.md;
+   the example is the component the table says first used it, when it still does */
+const files = Object.keys(import.meta.glob('/public/sounds/*.mp3')).map((p) => p.split('/').pop()!.replace('.mp3', '')).sort();
+const rows = new Map(
+  [...table.matchAll(/^\| `([\w-]+)` \| ([^|]+) \|[^|]*\|[^|]*\| ([\w-]+) \|/gm)].map((m) => [m[1], { what: m[2].trim(), first: m[3].trim() }]),
+);
+const sounds: SoundInfo[] = files.map((name) => {
+  const r = rows.get(name);
+  const users = Object.entries(blocks).filter(([, m]) => m.sounds?.includes(name)).map(([slug, m]) => ({ slug, name: m.name }));
+  users.sort((a, b) => (a.slug === r?.first ? -1 : b.slug === r?.first ? 1 : 0));
+  return { name, what: r?.what ?? '', users };
+});
+---
+
+<Layout title="Sounds | glitchnobody labs" description="Every sound used on glitchnobody labs, to play and download.">
+	<section class="hero">
+		<h1>sounds</h1>
+		<p>Every sound the components use. Press an orb to hear it, open it to see it in a component and download it.</p>
+	</section>
+	<Sounds client:load sounds={sounds} />
+</Layout>

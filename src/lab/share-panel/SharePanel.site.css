@@ -1,0 +1,3 @@
+/* card hit areas: the panel only reacts on the access row, field and button */
+.card .shp { pointer-events: none; }
+.card .shp-access, .card .shp-field { pointer-events: auto; }

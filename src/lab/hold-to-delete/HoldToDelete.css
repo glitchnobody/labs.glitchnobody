@@ -1,0 +1,312 @@
+/* Hold to delete: a pill in a raised ring that fills while held, then splits into a chip and Undo. */
+.htd {
+  --h: 56px;
+  --htd-c: var(--danger);
+  --htd-on: var(--on-slab);
+  --spring: linear(0, 0.06 3%, 0.24 7%, 0.56 13%, 0.86 20%, 1.04 27%, 1.1 33%, 1.08 39%, 1.02 48%, 0.99 57%, 0.99 68%, 1 82%, 1);
+  position: relative;
+  display: inline-flex;
+  padding: 4px;
+  background: var(--fill-slab);
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: var(--shadow-raised);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.htd[data-fill="accent"] {
+  --htd-c: var(--pick);
+}
+
+.htd[data-fill="ink"] {
+  --htd-c: var(--fill-on);
+  --htd-on: var(--fill-slab);
+}
+
+[data-stroke="on"] .htd {
+  box-shadow: var(--shadow-raised), 0 0 0 1px var(--pane-edge);
+}
+
+/* the pill: idle button, then the "Deleted" chip */
+.htd-pill {
+  --p: 0;
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  height: var(--h);
+  margin: 0;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--pane-edge);
+  color: var(--fill-on);
+  font: inherit;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    width 500ms var(--spring),
+    transform 150ms var(--ease),
+    background-color 300ms var(--ease),
+    color 300ms var(--ease);
+}
+
+[data-stroke="on"] .htd-pill {
+  box-shadow: inset 0 0 0 1px var(--pane-edge), inset 0 0 0 1px var(--pane-edge);
+}
+
+.htd[data-held] .htd-pill {
+  transform: scale(0.98);
+}
+
+.htd-pill:focus-visible,
+.htd-undo:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.htd[data-state="done"] .htd-pill,
+.htd[data-state="split"] .htd-pill {
+  pointer-events: none;
+  cursor: default;
+}
+
+.htd[data-state="split"] .htd-pill {
+  padding: 0 18px;
+  background: color-mix(in srgb, var(--htd-c) 12%, var(--fill-slab));
+  box-shadow: none;
+  color: var(--htd-c);
+}
+
+/* both labels in one grid cell, cross-faded; each is as wide as its own text.
+   Pinned to the pill's centre so the copy in the fill always lies exactly over it,
+   even while the pill is narrower than the wider label */
+.htd-faces {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+}
+
+/* before the first measure (server render) the base label sits in flow and sizes the pill */
+.htd:not([data-measured]) .htd-pill > .htd-faces {
+  position: static;
+  translate: none;
+}
+
+.htd-face {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity 200ms var(--ease),
+    transform 200ms var(--ease);
+}
+
+.htd-face[data-shown] {
+  opacity: 1;
+  transform: none;
+}
+
+.htd-icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.htd-faces > .htd-face:first-child .htd-icon {
+  color: var(--ink-3);
+}
+
+/* the fill and its white text are one layer, cut to the progress */
+.htd-over {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--htd-c);
+  color: var(--htd-on);
+  clip-path: inset(0 calc((1 - var(--p)) * 100%) 0 0 round var(--radius));
+  pointer-events: none;
+  transition: opacity 300ms var(--ease);
+}
+
+.htd-over .htd-face:first-child .htd-icon {
+  color: inherit;
+}
+
+.htd[data-state="split"] .htd-over {
+  opacity: 0;
+}
+
+/* Undo: grows out of nothing to the right of the chip */
+.htd-undo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 0;
+  height: var(--h);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--fill-on);
+  color: var(--fill-slab);
+  font: inherit;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    width 400ms var(--ease),
+    margin-left 400ms var(--ease),
+    opacity 200ms var(--ease);
+}
+
+.htd[data-state="split"] .htd-undo {
+  width: var(--uw);
+  margin-left: 8px;
+  opacity: 1;
+  pointer-events: auto;
+  transition:
+    width 550ms var(--spring) 60ms,
+    margin-left 550ms var(--spring),
+    opacity 150ms var(--ease),
+    background-color 150ms var(--ease);
+}
+
+.htd[data-state="split"] .htd-undo:hover {
+  background: var(--ink-2);
+}
+
+.htd-undo-face {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+}
+
+.htd-ring {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  transform: rotate(-90deg);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.htd-ring-track {
+  opacity: 0.25;
+}
+
+.htd-ring-left {
+  stroke-dasharray: 100;
+  stroke-linecap: round;
+}
+
+.htd[data-state="split"] .htd-ring-left {
+  animation: htd-ring var(--undo) linear forwards;
+}
+
+@keyframes htd-ring {
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* seconds left, above the Undo button while hovered */
+.htd-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: calc(4px + var(--uw) / 2);
+  padding: 6px 8px;
+  border-radius: var(--r-control);
+  background: var(--ink);
+  color: var(--on-ink);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transform: translate(50%, 4px);
+  pointer-events: none;
+  transition:
+    opacity 150ms var(--ease),
+    transform 150ms var(--ease);
+}
+
+.htd[data-state="split"]:has(.htd-undo:hover) .htd-tip {
+  opacity: 1;
+  transform: translate(50%, 0);
+}
+
+.htd-hint {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  color: var(--ink-3);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  opacity: 0;
+  transform: translate(-50%, -4px);
+  pointer-events: none;
+  transition:
+    opacity 200ms var(--ease),
+    transform 200ms var(--ease);
+}
+
+.htd-hint[data-shown] {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.htd-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* reduced motion: the fill still runs; widths jump and everything else cross-fades */
+@media (prefers-reduced-motion: reduce) {
+  .htd-pill,
+  .htd-undo,
+  .htd[data-state="split"] .htd-undo {
+    transition:
+      opacity 150ms linear,
+      background-color 150ms linear,
+      color 150ms linear;
+  }
+  .htd[data-held] .htd-pill {
+    transform: none;
+  }
+  .htd-face,
+  .htd-hint,
+  .htd-tip {
+    transition-property: opacity;
+  }
+}

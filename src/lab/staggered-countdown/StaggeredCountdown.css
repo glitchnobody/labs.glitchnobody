@@ -1,0 +1,145 @@
+/* Staggered countdown: one line of rolling digits, sized to its text. */
+.sc {
+  --h: 1.15em; /* one digit's window, and each cell of the strip */
+  position: relative;
+  display: inline-flex;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font-family: var(--font-ui);
+  font-size: var(--size);
+  font-weight: var(--weight);
+  line-height: var(--h);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--t-fast) var(--ease);
+}
+
+.sc:hover {
+  color: var(--fill-on);
+}
+
+.sc:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--r-control);
+}
+
+.sc-affix {
+  color: var(--fill-on);
+}
+
+.sc[data-accent] .sc-affix {
+  color: var(--pick);
+}
+
+.sc-digits {
+  display: inline-flex;
+  letter-spacing: 0;
+}
+
+/* a window one digit wide and tall; it collapses when the number no longer needs it */
+.sc-slot,
+.sc-mark {
+  display: inline-block;
+  height: var(--h);
+  overflow: hidden;
+  transition: width var(--roll) cubic-bezier(0.2, 0.7, 0.2, 1) var(--delay, 0ms), opacity var(--roll) var(--ease) var(--delay, 0ms);
+}
+
+.sc-slot {
+  width: var(--digit);
+}
+
+.sc-mark {
+  width: var(--mark);
+  color: var(--ink-3);
+}
+
+.sc-mark.sc-point {
+  width: auto;
+}
+
+.sc-slot[data-blank],
+.sc-mark[data-blank] {
+  width: 0;
+  opacity: 0;
+}
+
+.sc-strip {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(var(--pos) * -1 * var(--h)));
+  transition: transform var(--roll) var(--roll-ease) var(--delay);
+}
+
+.sc-strip > span {
+  height: var(--h);
+  text-align: center;
+}
+
+.sc[data-blur] .sc-slot[data-moving] .sc-strip {
+  filter: var(--blur);
+}
+
+/* strips parked on the middle copy after a roll move without animating */
+.sc[data-snap] .sc-strip {
+  transition: none;
+}
+
+.sc-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.sc-sizer {
+  position: absolute;
+  display: flex;
+  letter-spacing: 0;
+  white-space: pre;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sc-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* reduced motion: no roll and no blur; each digit swaps in with a short fade */
+@media (prefers-reduced-motion: reduce) {
+  .sc-strip {
+    transition-duration: 0s;
+  }
+
+  .sc-slot,
+  .sc-mark {
+    transition-duration: 150ms;
+  }
+
+  .sc[data-blur] .sc-slot[data-moving] .sc-strip {
+    filter: none;
+  }
+
+  .sc-slot[data-moving] .sc-strip {
+    animation: sc-fade 150ms var(--ease);
+  }
+}
+
+@keyframes sc-fade {
+  from {
+    opacity: 0;
+  }
+}

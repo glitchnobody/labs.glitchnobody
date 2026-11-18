@@ -1,0 +1,3 @@
+/* card hit areas: the title falls through to the card link */
+.card .cls { pointer-events: none; }
+.card .cls-tile { pointer-events: auto; }

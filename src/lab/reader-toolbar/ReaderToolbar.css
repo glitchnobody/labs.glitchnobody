@@ -1,0 +1,190 @@
+/* Reader toolbar: a pill that swaps its title for actions. */
+.rt {
+  --edge: var(--shadow-raised);
+  position: relative;
+  box-sizing: border-box;
+  display: block;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--fill-slab);
+  box-shadow: var(--edge);
+  color: var(--fill-on);
+  font-family: var(--font-ui);
+  user-select: none;
+  transition: width var(--speed) var(--ease);
+}
+
+[data-stroke="on"] .rt {
+  box-shadow: var(--edge), 0 0 0 1px var(--pane-edge);
+}
+
+.rt-btn {
+  position: absolute;
+  top: 4px;
+  box-sizing: border-box;
+  width: var(--btn);
+  height: var(--btn);
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--fill-on);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--t-fast) var(--ease), opacity var(--speed) var(--ease), filter var(--speed) var(--ease),
+    transform var(--speed) var(--ease);
+}
+
+.rt-btn > svg {
+  display: block;
+}
+
+.rt-btn:hover {
+  background: color-mix(in srgb, var(--fill-on) 8%, transparent);
+}
+
+.rt-btn:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.rt-back {
+  left: 4px;
+}
+
+.rt-more,
+.rt-act[data-kind="close"] {
+  background: color-mix(in srgb, var(--fill-on) 6%, transparent);
+}
+
+.rt-more:hover,
+.rt-act[data-kind="close"]:hover {
+  background: color-mix(in srgb, var(--fill-on) 12%, transparent);
+}
+
+.rt-more {
+  right: 4px;
+}
+
+.rt-cover {
+  position: absolute;
+  top: 6px;
+  left: calc(8px + var(--btn));
+  box-sizing: border-box;
+  width: calc(var(--h) - 12px);
+  height: calc(var(--h) - 12px);
+  display: grid;
+  place-items: center;
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px var(--pane-edge);
+  border-radius: var(--r-control);
+  color: #fff; /* white on the gradient cover, as the design allows on images */
+  font-size: 11px;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.rt[data-cover="square"] .rt-cover {
+  border-radius: var(--r-card);
+}
+
+.rt[data-cover="round"] .rt-cover {
+  border-radius: 50%;
+}
+
+.rt-text {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(16px + var(--btn) + var(--h) - 12px);
+  right: calc(12px + var(--btn));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.rt-title,
+.rt-author {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rt-title {
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 500;
+}
+
+.rt[style*="--h: 40px"] .rt-title {
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.rt-author {
+  color: var(--ink-3);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.rt-actions {
+  position: absolute;
+  inset: 0;
+}
+
+/* reading items leave; actions enter */
+.rt-read,
+.rt-text {
+  transition: opacity var(--speed) var(--ease), filter var(--speed) var(--ease), transform var(--speed) var(--ease);
+}
+
+.rt[data-open] .rt-read {
+  opacity: 0;
+  filter: blur(var(--blur));
+  transform: translateX(-6px);
+}
+
+.rt-act {
+  right: calc(4px + (var(--n) - 1 - var(--i)) * (var(--btn) + 8px));
+  opacity: 0;
+  filter: blur(var(--blur));
+  transform: translateX(6px);
+  transition-delay: 0ms, calc((var(--n) - 1 - var(--i)) * var(--stagger)), calc((var(--n) - 1 - var(--i)) * var(--stagger)),
+    calc((var(--n) - 1 - var(--i)) * var(--stagger));
+}
+
+.rt[data-open] .rt-act {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+  transition-delay: 0ms, calc(var(--i) * var(--stagger)), calc(var(--i) * var(--stagger)), calc(var(--i) * var(--stagger));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rt {
+    transition: none;
+  }
+
+  .rt-read,
+  .rt-act,
+  .rt[data-open] .rt-read,
+  .rt[data-open] .rt-act {
+    filter: none;
+    transform: none;
+    transition: opacity 120ms linear;
+    transition-delay: 0ms;
+  }
+
+  .rt-btn {
+    transition: opacity 120ms linear, background-color var(--t-fast) var(--ease);
+  }
+}

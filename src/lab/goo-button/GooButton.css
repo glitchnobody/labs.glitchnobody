@@ -1,0 +1,58 @@
+.goo {
+  --ease-in: cubic-bezier(.34, 1.45, .64, 1);
+  --ease-back: cubic-bezier(.3, 1.9, .5, 1);
+  --bg: var(--fill-on);
+  --fg: var(--fill-slab);
+  --m: 0px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap);
+  height: var(--h);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font: 500 var(--font) / 1 var(--font-ui);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: var(--r-pill);
+  /* only the visible shapes react, never the gap */
+  pointer-events: none;
+}
+.goo[data-accent="Pick"] { --bg: var(--pick); --fg: var(--on-slab); }
+.goo[data-on="true"] { --m: var(--mv); }
+.goo:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
+
+.goo-svg { position: absolute; left: calc(-1 * 40px); top: calc(-1 * 40px); overflow: visible; pointer-events: none; }
+.goo-shape { fill: var(--bg); transition: transform 380ms var(--ease-back); }
+.goo-shape-pill { transform: translateX(var(--m)); }
+.goo-shape-dot { transform: translateX(calc(-1 * var(--m))); }
+
+.goo-pill, .goo-dot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--h);
+  border-radius: var(--r-pill);
+  pointer-events: auto;
+  transition: transform 380ms var(--ease-back);
+}
+.goo-pill { padding: 0 var(--pad); white-space: nowrap; transform: translateX(var(--m)); }
+.goo-dot { width: var(--h); transform: translateX(calc(-1 * var(--m))); }
+.goo[data-on="true"] :is(.goo-shape, .goo-pill, .goo-dot) { transition-timing-function: var(--ease-in); }
+
+.goo-turn { display: inline-flex; transition: transform 300ms var(--ease-in); }
+.goo[data-on="true"] .goo-turn { transform: rotate(-45deg); }
+.goo-arr { display: inline-flex; overflow: visible; transition: transform 220ms cubic-bezier(.5, 0, .75, 0), opacity 220ms; }
+.goo-arr[data-phase="out"] { transform: translateX(160%); opacity: 0; }
+.goo-arr[data-phase="in"] { transform: translateX(-160%); opacity: 0; transition: none; }
+.goo-arr[data-phase="rest"] { transition-timing-function: cubic-bezier(.2, .7, .2, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .goo[data-on="true"] { --m: 0px; }
+  .goo-arr[data-phase] { transform: none; }
+}

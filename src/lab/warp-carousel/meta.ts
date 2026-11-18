@@ -1,0 +1,41 @@
+import type { Meta } from "..";
+import "./WarpCarousel.css";
+
+export default {
+  name: "Warp carousel",
+  description: "A carousel of cards on a bent track that streak as they spin. Drag or flick it, click a side card to bring it forward, or let the step player run it.",
+  tag: "Drag",
+  install: "npm install @iconify/react",
+  sounds: ["whoosh", "tick"],
+  siteProps: { images: [1, 4, 7, 9, 11, 2].map((n) => `/lab/demoimages/${n}.png`) },
+  demo: [
+    { move: [0.9, 0.95], ms: 0 },
+    { move: [0.5, 0.4], ms: 500 },
+    { down: true },
+    { move: [0.2, 0.4], ms: 250 },
+    { up: true },
+    { wait: 600 },
+    { move: [0.82, 0.4], ms: 400 },
+    { down: true },
+    { up: true },
+    { wait: 600 },
+    { move: [0.706, 0.92], ms: 500 },
+    { down: true },
+    { up: true },
+    { wait: 3800 },
+    { down: true },
+    { up: true },
+    { move: [0.95, 0.6], ms: 500 },
+  ],
+  knobs: [
+    { prop: "bend", label: "Bend", type: "range", min: 0, max: 100, default: 60 },
+    { prop: "smear", label: "Smear", type: "range", min: 0, max: 100, default: 55 },
+    { prop: "count", label: "Cards", type: "range", min: 3, max: 6, default: 5 },
+    { prop: "cardWidth", label: "Card width (px)", type: "range", min: 100, max: 200, default: 120 },
+    { prop: "interval", label: "Autoplay (s)", type: "range", min: 1.5, max: 8, step: 0.5, default: 3 },
+    { prop: "momentum", label: "Momentum", type: "range", min: 0, max: 100, default: 50 },
+    { prop: "sound", label: "Sound", type: "toggle", default: true },
+    { prop: "volume", label: "Volume", type: "range", min: 0, max: 100, default: 70 },
+  ],
+  load: () => import("./WarpCarousel").then((m) => m.WarpCarousel),
+} satisfies Meta;

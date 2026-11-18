@@ -1,0 +1,24 @@
+.wcr { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 340px; font-family: var(--font-ui); }
+.wcr-stage {
+  position: relative; width: 340px; height: calc(var(--wcr-w) * 4 / 3 + 16px); perspective: 700px; touch-action: pan-y; user-select: none; outline: none; cursor: grab;
+  mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.wcr-stage:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
+.wcr-ring { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; }
+.wcr-card { position: absolute; left: calc(var(--wcr-w) / -2); top: calc(var(--wcr-w) * -2 / 3); width: var(--wcr-w); height: calc(var(--wcr-w) * 4 / 3); transform-style: preserve-3d; }
+.wcr-face, .wcr-smear { position: absolute; inset: 0; border-radius: var(--r-card); }
+.wcr-face { box-shadow: 0 8px 24px rgb(0 0 0 / 18%); }
+.wcr-card[data-back="true"] .wcr-face { filter: brightness(.75); }
+.wcr-smear { mask: linear-gradient(90deg, #000, transparent); pointer-events: none; }
+.wcr-card .wcr-smear[style*="left center"] { mask: linear-gradient(90deg, transparent, #000 60%); }
+.wcr-player { display: flex; align-items: center; gap: 8px; }
+.wcr-steps { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--fill-on) 10%, var(--fill-slab)); }
+.wcr-dot { position: relative; width: 8px; height: 8px; padding: 0; border: 0; border-radius: var(--r-pill); background: color-mix(in srgb, var(--fill-on) 22%, transparent); cursor: pointer; overflow: hidden; transition: width 260ms cubic-bezier(.2,.7,.2,1); }
+.wcr-dot::before { content: ""; position: absolute; inset: -8px -2px; }
+.wcr-dot[data-on="true"] { width: 44px; }
+.wcr-dot i { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--p) * 100%); border-radius: inherit; background: color-mix(in srgb, var(--fill-on) 55%, transparent); }
+.wcr-play { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: color-mix(in srgb, var(--fill-on) 10%, var(--fill-slab)); color: var(--fill-on); cursor: pointer; }
+.wcr-dot:focus-visible, .wcr-play:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
+[data-stroke="on"] .wcr-steps, [data-stroke="on"] .wcr-play { box-shadow: 0 0 0 1px var(--pane-edge); }
+.wcr-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (prefers-reduced-motion: reduce) { .wcr-dot { transition: none; } }

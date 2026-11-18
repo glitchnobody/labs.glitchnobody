@@ -1,0 +1,8 @@
+/* card hit areas: only the painted pill reacts; the corners past its rounded ends and the bulge room fall through */
+.card .jly {
+  pointer-events: none;
+}
+
+.card .jly-track {
+  pointer-events: visiblePainted;
+}

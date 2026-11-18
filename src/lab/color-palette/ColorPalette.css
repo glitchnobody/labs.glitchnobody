@@ -1,0 +1,148 @@
+.cp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 220px;
+  font-family: var(--font-ui);
+}
+.cp-title {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--fill-on);
+}
+.cp-tile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 220px;
+  height: 56px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  border-radius: var(--r-panel);
+  background: color-mix(in srgb, var(--fill-on) 9%, var(--fill-slab));
+}
+[data-stroke="on"] .cp-tile { box-shadow: 0 0 0 1px var(--pane-edge); }
+
+.cp-row {
+  flex: 1;
+  display: flex;
+  height: 32px;
+  border-radius: var(--r-control);
+  overflow: hidden;
+  min-width: 0;
+}
+.cp-sw {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-sw);
+  overflow: hidden;
+  perspective: 400px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  transition: transform 180ms var(--ease-out);
+}
+.cp-sw:focus-visible { outline: 1.5px solid var(--focus); outline-offset: -3px; }
+.cp-sw[data-locked] { animation: cp-bounce 260ms var(--ease-out); }
+.cp-sw[data-locked]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ink-sw) 40%, transparent);
+  pointer-events: none;
+}
+@keyframes cp-bounce { 40% { transform: scale(1.06); } }
+
+.cp-reel { position: absolute; inset: 0; }
+.cp-layer {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+[data-motion="tween"] .cp-new { transition: background-color 300ms var(--ease) var(--d); }
+
+[data-motion="roll"] .cp-new[data-fresh] { animation: cp-in 240ms cubic-bezier(0.3, 1.4, 0.5, 1) var(--d) both; }
+[data-motion="roll"] .cp-old { animation: cp-out 240ms var(--ease) var(--d) both; }
+@keyframes cp-in { from { transform: translateY(100%); filter: blur(2px); } 60% { filter: blur(1px); } to { transform: none; filter: none; } }
+@keyframes cp-out { to { transform: translateY(-100%); filter: blur(2px); } }
+
+[data-motion="flip"] .cp-old { animation: cp-flip-out 300ms var(--ease) var(--d) both; }
+[data-motion="flip"] .cp-new[data-fresh] { animation: cp-flip-in 300ms var(--ease) var(--d) both; }
+@keyframes cp-flip-out { 50%, to { transform: rotateX(90deg); } }
+@keyframes cp-flip-in { 0%, 50% { transform: rotateX(-90deg); } to { transform: none; } }
+
+.cp-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3px;
+  text-align: center;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  line-height: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease);
+  pointer-events: none;
+}
+[data-labels="always"] .cp-label,
+[data-labels="hover"] .cp-sw:hover .cp-label,
+[data-labels="hover"] .cp-sw:focus-visible .cp-label,
+.cp-sw[data-copied] .cp-label { opacity: 1; }
+.cp-label[data-manual] { user-select: text; -webkit-user-select: text; pointer-events: auto; }
+
+.cp-lock { position: absolute; top: 3px; right: 3px; pointer-events: none; }
+.cp-ring { position: absolute; pointer-events: none; transform: rotate(-90deg); }
+.cp-ring circle {
+  fill: none;
+  stroke: var(--ink-sw);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  animation: cp-fill 350ms linear both;
+}
+@keyframes cp-fill { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+.cp-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--fill-on);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background var(--t-fast) var(--ease);
+}
+.cp-btn:hover { background: color-mix(in srgb, var(--fill-on) 10%, transparent); }
+.cp-btn:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
+.cp-spin { display: grid; width: 16px; height: 16px; }
+.cp-spin[data-spin] { animation: cp-turn 400ms var(--ease) both; }
+@keyframes cp-turn { to { transform: rotate(360deg); } }
+
+.cp-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-spin[data-spin], .cp-sw[data-locked] { animation: none; }
+  .cp .cp-new[data-fresh] { animation: cp-fade 120ms linear var(--d) both; }
+  .cp .cp-old { animation: none; }
+  .cp .cp-new { transition-duration: 120ms; }
+}
+@keyframes cp-fade { from { opacity: 0; } }

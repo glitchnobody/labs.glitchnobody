@@ -1,0 +1,7 @@
+/* card hit areas: only the tile reacts on the wall */
+.card .vs {
+  pointer-events: none;
+}
+.card .vs-tile {
+  pointer-events: auto;
+}

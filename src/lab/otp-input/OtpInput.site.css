@@ -1,0 +1,4 @@
+/* card hit areas: only the row and the resend button react; the rest opens the modal */
+.card .otp { pointer-events: none; }
+.card .otp-input,
+.card .otp-resend { pointer-events: auto; }

@@ -1,0 +1,81 @@
+.ovb {
+  --ovb-accent: var(--fill-on);
+  position: relative; box-sizing: border-box; width: 340px; padding: 16px; border-radius: var(--r-panel);
+  background: var(--fill-slab); color: var(--fill-on); box-shadow: var(--shadow-raised); font-family: var(--font-ui); user-select: none;
+}
+.ovb[data-accent="pick"] { --ovb-accent: var(--pick); }
+.ovb[data-accent="ok"] { --ovb-accent: var(--ok); }
+[data-theme="dark"] .ovb { box-shadow: 0 0 0 1px var(--pane-edge); }
+[data-stroke="on"] .ovb { box-shadow: var(--shadow-raised), 0 0 0 1px var(--pane-edge); }
+.ovb-head { display: flex; justify-content: space-between; align-items: center; }
+.ovb-title { font-size: 16px; line-height: 20px; font-weight: 500; }
+.ovb-pick { position: relative; }
+.ovb-btn {
+  display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; font: inherit; font-size: 13px; color: var(--fill-on); cursor: pointer;
+  background: color-mix(in srgb, var(--fill-on) 4%, var(--fill-slab)); border: 1px solid var(--pane-edge); border-radius: var(--r-control);
+}
+.ovb-btn:hover { background: color-mix(in srgb, var(--fill-on) 8%, var(--fill-slab)); }
+.ovb-btn:focus-visible, .ovb-chart:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
+.ovb-menu {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 3; min-width: 128px; margin: 0; padding: 4px; list-style: none;
+  background: var(--fill-slab); border-radius: var(--r-panel); box-shadow: 0 0 0 1px var(--pane-edge), var(--shadow-float);
+  transform-origin: top right; animation: ovb-pop 140ms cubic-bezier(.2,.7,.2,1);
+}
+.ovb-menu li { display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 28px; padding: 0 8px; border-radius: var(--r-control); font-size: 13px; cursor: pointer; }
+.ovb-menu li[data-hi="true"] { background: color-mix(in srgb, var(--fill-on) 7%, transparent); }
+@keyframes ovb-pop { from { opacity: 0; transform: scale(.95); } }
+.ovb-sub { margin-top: 8px; font-size: 12px; line-height: 16px; color: var(--ink-3); }
+.ovb-num { display: flex; align-items: center; gap: 2px; font-size: 20px; line-height: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.ovb-of { color: var(--ink-3); }
+.ovb-badge {
+  margin-left: 8px; padding: 2px 6px; border-radius: var(--r-control); font-size: 11px; line-height: 14px; font-weight: 500;
+  color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, var(--fill-slab));
+}
+.ovb-badge[data-up="false"] { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--fill-slab)); }
+.ovb-roll { display: inline-flex; }
+.ovb-dig { display: inline-block; height: 24px; overflow: hidden; }
+.ovb-dig > span { display: flex; flex-direction: column; transition: transform 450ms cubic-bezier(.2,.7,.2,1); }
+.ovb-dig > span > span { height: 24px; }
+.ovb-chart { position: relative; margin-top: 16px; outline: none; touch-action: pan-y; }
+.ovb-grid { position: absolute; inset: 0 0 20px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+.ovb-grid i { border-top: 1px dashed var(--pane-edge); }
+.ovb-plot { position: relative; height: 110px; }
+.ovb-bar {
+  position: absolute; bottom: 0; box-sizing: border-box; border-radius: var(--ovb-r); overflow: hidden; transform-origin: bottom;
+  background: color-mix(in srgb, var(--fill-on) 4%, var(--fill-slab)); box-shadow: inset 0 0 0 1px var(--pane-edge);
+  transition: left 350ms cubic-bezier(.2,.7,.2,1), width 350ms cubic-bezier(.2,.7,.2,1), height 350ms cubic-bezier(.2,.7,.2,1), transform 350ms cubic-bezier(.2,.7,.2,1), opacity 300ms, box-shadow 120ms;
+}
+.ovb-bar[data-new="true"] { transform: scaleY(0); transition: none; }
+.ovb-bar[data-gone="true"] { transform: scaleY(0); opacity: 0; }
+.ovb-act {
+  position: absolute; left: 0; right: 0; bottom: 0; border-radius: var(--ovb-r);
+  background-color: color-mix(in srgb, var(--fill-on) 8%, var(--fill-slab)); transition: background-color 120ms;
+}
+.ovb[data-hatch="true"] .ovb-act { background-image: repeating-linear-gradient(var(--ovb-angle), color-mix(in srgb, var(--fill-on) 14%, transparent) 0 1px, transparent 1px 9px); }
+.ovb-bar[data-on="true"] { box-shadow: inset 0 0 0 1px var(--ovb-accent); }
+.ovb-bar[data-on="true"] .ovb-act { background-color: var(--ovb-accent); }
+.ovb[data-hatch="true"] .ovb-bar[data-on="true"] .ovb-act { background-image: repeating-linear-gradient(var(--ovb-angle), color-mix(in srgb, var(--fill-slab) 22%, transparent) 0 1px, transparent 1px 9px); }
+.ovb-pin {
+  position: absolute; z-index: 1; width: 8px; height: 8px; margin: 0 0 -4px -4px; box-sizing: border-box; border-radius: 50%;
+  border: 2px solid var(--ovb-accent); background: var(--fill-slab); pointer-events: none;
+  transition: left 140ms ease-out, bottom 140ms ease-out; animation: ovb-pin 160ms ease-out;
+}
+@keyframes ovb-pin { from { transform: scale(.6); opacity: 0; } }
+.ovb-tip {
+  position: absolute; z-index: 2; display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; border-radius: var(--r-panel); white-space: nowrap;
+  background: var(--fill-on); color: var(--fill-slab); transform: translateX(-50%); pointer-events: none; box-shadow: var(--shadow-float);
+  transition: left 140ms ease-out, bottom 140ms ease-out; animation: ovb-in 140ms ease-out;
+}
+.ovb-tip span { font-size: 12px; line-height: 16px; opacity: .75; }
+.ovb-tip b { font-size: 14px; line-height: 18px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.ovb-tip i { position: absolute; top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: var(--fill-on); transition: left 140ms ease-out; }
+@keyframes ovb-in { from { opacity: 0; } }
+.ovb-labels { position: relative; height: 20px; }
+.ovb-labels span { position: absolute; top: 4px; transform: translateX(-50%); font-size: 12px; line-height: 16px; color: var(--ink-3); transition: left 350ms cubic-bezier(.2,.7,.2,1); }
+.ovb-labels span[data-skip="true"] { visibility: hidden; }
+.ovb-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (prefers-reduced-motion: reduce) {
+  .ovb-bar, .ovb-labels span { transition: opacity 120ms; }
+  .ovb-pin, .ovb-tip, .ovb-tip i, .ovb-dig > span { transition: none; }
+  .ovb-menu { animation: none; }
+}

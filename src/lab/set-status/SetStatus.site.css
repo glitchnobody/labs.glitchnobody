@@ -1,0 +1,8 @@
+/* card hit areas: only the pill, the row and the cross react */
+.card .sst {
+  pointer-events: none;
+}
+.card .sst-pill,
+.card .sst-row {
+  pointer-events: auto;
+}

@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "skills": {
+    "sound-effects": {
+      "source": "elevenlabs/skills",
+      "commit": "64271c12b46efb7c9a0b65c8ec521683bb35fc4a",
+      "sourceType": "github",
+      "skillPath": "sound-effects/SKILL.md",
+      "computedHash": "5c0a1d653194633986f9887c599f3f98c595bce0fcb0e16dc5d90935ec65a6df"
+    }
+  }
+}

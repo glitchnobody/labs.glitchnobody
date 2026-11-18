@@ -1,0 +1,3 @@
+/* card hit areas: the gap between zone and chips falls through */
+.card .fup, .card .fup-chips { pointer-events: none; }
+.card .fup-zone, .card .fup-chip { pointer-events: auto; }

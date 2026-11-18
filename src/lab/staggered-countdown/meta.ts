@@ -1,0 +1,42 @@
+import type { Meta } from "..";
+import "./StaggeredCountdown.css";
+
+export default {
+  name: "Staggered countdown",
+  description: "A big number whose digits roll like an odometer, one after another. Press it to count down; at zero, press again to roll back up.",
+  tag: "Press",
+  sounds: ["tick"],
+  demo: [
+    { move: [1.25, 1.6], ms: 0 },
+    { move: [0.5, 0.5], ms: 600 },
+    { down: true },
+    { up: true },
+    { wait: 1000 },
+    { down: true },
+    { up: true },
+    { wait: 30 },
+    { down: true },
+    { up: true },
+    { wait: 1200 },
+    { move: [1.25, 1.6], ms: 600 },
+  ],
+  knobs: [
+    { prop: "value", label: "Start value", type: "range", min: 0, max: 9999999, step: 1, default: 987654 },
+    { prop: "drop", label: "Count down by", type: "select", options: ["Random", "1", "10", "100", "1,000"], default: "Random" },
+    { prop: "prefix", label: "Prefix", type: "text", maxLength: 3, default: "" },
+    { prop: "suffix", label: "Suffix", type: "text", maxLength: 3, default: "$" },
+    { prop: "accent", label: "Accent affixes", type: "toggle", default: true },
+    { prop: "separator", label: "Separator", type: "select", options: ["None", "Comma", "Dot", "Space"], default: "None" },
+    { prop: "decimals", label: "Decimals", type: "range", min: 0, max: 2, default: 0 },
+    { prop: "direction", label: "Stagger from", type: "select", options: ["Right", "Left", "Centre"], default: "Right" },
+    { prop: "stagger", label: "Stagger (ms)", type: "range", min: 0, max: 150, step: 5, default: 40 },
+    { prop: "duration", label: "Roll (ms)", type: "range", min: 200, max: 1500, step: 50, default: 600 },
+    { prop: "easing", label: "Easing", type: "select", options: ["Smooth", "Overshoot", "Linear"], default: "Overshoot" },
+    { prop: "blur", label: "Motion blur", type: "toggle", default: true },
+    { prop: "size", label: "Size (px)", type: "range", min: 24, max: 96, default: 40 },
+    { prop: "weight", label: "Weight", type: "select", options: ["Light", "Regular", "Medium"], default: "Medium" },
+    { prop: "sound", label: "Sound", type: "toggle", default: true },
+    { prop: "volume", label: "Volume", type: "range", min: 0, max: 100, default: 70 },
+  ],
+  load: () => import("./StaggeredCountdown").then((m) => m.StaggeredCountdown),
+} satisfies Meta;

@@ -1,0 +1,3 @@
+/* card hit areas: only the field reacts; the rules and the margin open the modal */
+.card .ibx { pointer-events: none; }
+.card .ibx-field { pointer-events: auto; }

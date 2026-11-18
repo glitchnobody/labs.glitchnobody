@@ -1,0 +1,20 @@
+.lqw {
+  display: block;
+  overflow: visible;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+  border-radius: var(--r-control);
+}
+
+.lqw:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.lqw-text {
+  font-family: var(--font-ui);
+  font-weight: var(--lqw-weight);
+  letter-spacing: -0.02em;
+}

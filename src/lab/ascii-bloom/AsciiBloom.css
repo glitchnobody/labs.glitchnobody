@@ -1,0 +1,5 @@
+.asb { width: var(--asb-w); height: var(--asb-h); border-radius: var(--r-panel); overflow: hidden; box-shadow: 0 0 0 1px var(--pane-edge); color: var(--fill-on); }
+.asb[data-ink="pick"] { color: var(--pick); }
+.asb[data-ink="ok"] { color: var(--ok); }
+.asb-cv { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; outline: none; cursor: ns-resize; color: inherit; }
+.asb:has(.asb-cv:focus-visible) { box-shadow: 0 0 0 1px var(--pane-edge), 0 0 0 3px var(--focus); }

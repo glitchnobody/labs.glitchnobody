@@ -1,0 +1,3 @@
+/* card hit areas: only the cards and buttons react */
+.card .evs, .card .evs-list, .card .evs-bar { pointer-events: none; }
+.card .evs-card[data-top="true"], .card .evs-btn, .card .evs-restore { pointer-events: auto; }

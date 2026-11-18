@@ -1,0 +1,73 @@
+.rtk {
+  --rtk-acc: var(--pick); --rtk-on-acc: #fff;
+  position: relative; width: 340px; height: 250px; box-sizing: border-box; border-radius: var(--r-panel);
+  background-color: var(--fill-slab); border: 1px solid var(--pane-edge);
+  background-image: linear-gradient(var(--pane-edge) 1px, transparent 1px), linear-gradient(90deg, var(--pane-edge) 1px, transparent 1px);
+  background-size: 40px 40px; background-position: -1px -1px;
+  font-family: var(--font-ui); color: var(--fill-on); user-select: none; -webkit-user-select: none; touch-action: none; outline: none; cursor: default;
+}
+.rtk[data-accent="ink"] { --rtk-acc: var(--fill-on); --rtk-on-acc: var(--fill-slab); }
+.rtk:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+.rtk-hint { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); font-size: 12px; color: var(--ink-4); pointer-events: none; white-space: nowrap; }
+.rtk-pill {
+  position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); height: 32px; padding: 0 6px 0 12px; display: flex; align-items: center;
+  border-radius: var(--r-pill); background: var(--fill-slab); box-shadow: 0 0 0 1px var(--pane-edge), var(--shadow-raised); pointer-events: none; white-space: nowrap;
+}
+.rtk-cur { display: flex; align-items: center; gap: 8px; animation: rtk-swap 220ms ease-out; }
+.rtk-cur b { font-size: 13px; font-weight: 500; }
+.rtk kbd {
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; box-sizing: border-box; border-radius: var(--r-control);
+  font: 500 12px/1 var(--font-ui); color: var(--ink-3); background: color-mix(in srgb, var(--fill-on) 8%, var(--fill-slab));
+}
+.rtk-cur:not(:has(kbd)) { padding-right: 6px; }
+@keyframes rtk-swap { from { opacity: 0; filter: blur(4px); } }
+.rtk-ring { position: absolute; width: 0; height: 0; z-index: 2; pointer-events: none; }
+.rtk-svg { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); overflow: visible; }
+.rtk-track { fill: none; stroke: color-mix(in srgb, var(--fill-on) 6%, transparent); stroke-width: 12; }
+.rtk-core { fill: none; stroke: var(--rtk-acc); stroke-width: 3; }
+.rtk-g0 { stop-color: var(--rtk-acc); stop-opacity: .04; }
+.rtk-g1 { stop-color: var(--rtk-acc); stop-opacity: .18; }
+.rtk-wedge { transition: transform 180ms cubic-bezier(.3,1.4,.5,1); }
+.rtk-arc { fill: none; stroke: var(--rtk-acc); stroke-width: 3; stroke-linecap: round; }
+.rtk-item {
+  position: absolute; left: 0; top: 0; transform: translate(var(--x), var(--y));
+  transition: transform var(--rtk-ms) cubic-bezier(.2,.9,.3,1.15), opacity calc(var(--rtk-ms) * .6) ease-out;
+}
+.rtk-btn {
+  position: absolute; left: -20px; top: -20px; display: grid; place-items: center; width: 40px; height: 40px; box-sizing: border-box;
+  border-radius: var(--r-control); background: var(--fill-slab); box-shadow: 0 0 0 1px var(--pane-edge), var(--shadow-raised); color: var(--fill-on);
+  transition: box-shadow 120ms, color 120ms, transform 120ms;
+}
+.rtk-item[data-on="true"] .rtk-btn { box-shadow: 0 0 0 2px var(--rtk-acc), var(--shadow-raised); color: var(--rtk-acc); }
+.rtk-label {
+  position: absolute; top: -14px; display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; box-sizing: border-box; white-space: nowrap;
+  border-radius: var(--r-pill); background: color-mix(in srgb, var(--fill-on) 7%, var(--fill-slab)); font-size: 14px; transition: background 120ms, color 120ms;
+}
+.rtk-item[data-side="r"] .rtk-label { left: 28px; padding-right: 4px; }
+.rtk-item[data-side="r"] .rtk-label kbd { order: 2; }
+.rtk-item[data-side="l"] .rtk-label { right: 28px; padding-left: 4px; }
+.rtk-item[data-side="t"] .rtk-label { left: 0; top: -54px; transform: translateX(-50%); padding-left: 4px; }
+.rtk-item[data-side="b"] .rtk-label { left: 0; top: 26px; transform: translateX(-50%); }
+.rtk-more .rtk-label { top: -14px; color: var(--ink-3); }
+.rtk-item[data-on="true"] .rtk-label { background: var(--rtk-acc); color: var(--rtk-on-acc); }
+.rtk-item[data-on="true"] .rtk-label kbd { background: var(--rtk-on-acc); color: var(--rtk-acc); }
+/* blooms: entering and closing both run from the "from" pose below */
+.rtk-ring[data-state="open"] .rtk-svg { animation: rtk-fade var(--rtk-ms) ease-out; }
+.rtk-ring[data-state="closing"] .rtk-svg { opacity: 0; transform: translate(-50%, -50%) scale(.6); transition: opacity calc(var(--rtk-ms) * .6), transform calc(var(--rtk-ms) * .6); }
+.rtk-ring[data-state="closing"] .rtk-item { transform: translate(0, 0) scale(.4); opacity: 0; transition-duration: calc(var(--rtk-ms) * .6); transition-delay: 0ms; }
+@keyframes rtk-fade { from { opacity: 0; transform: translate(-50%, -50%) scale(.6); } }
+.rtk[data-bloom="scale"] .rtk-ring[data-state="open"] { animation: rtk-scale var(--rtk-ms) cubic-bezier(.2,.9,.3,1.1); }
+@keyframes rtk-scale { from { opacity: 0; transform: scale(.6); } }
+.rtk[data-bloom="stagger"] .rtk-ring[data-state="open"] .rtk-item { animation: rtk-pop calc(var(--rtk-ms) * .7) cubic-bezier(.2,.9,.3,1.2) both; animation-delay: calc(var(--rtk-ms) * .3 * var(--i) / var(--n)); }
+.rtk[data-bloom="stagger"] .rtk-ring[data-state="open"] .rtk-label { animation: rtk-lab calc(var(--rtk-ms) * .5) ease-out both; animation-delay: calc(var(--rtk-ms) * (.3 * var(--i) / var(--n) + .4)); }
+@keyframes rtk-pop { from { transform: translate(0, 0) scale(.3); opacity: 0; } }
+@keyframes rtk-lab { from { opacity: 0; } }
+.rtk[data-bloom="spin-in"] .rtk-ring[data-state="open"] .rtk-item { animation: rtk-spin var(--rtk-ms) cubic-bezier(.2,.8,.3,1.1) both; }
+@keyframes rtk-spin { from { transform: rotate(-40deg) translate(0, 0) scale(.3); opacity: 0; } 60% { opacity: 1; } }
+.rtk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+[data-stroke="on"] .rtk-btn { box-shadow: 0 0 0 1px var(--pane-edge), var(--shadow-raised), 0 0 0 2px var(--pane-edge); }
+@media (prefers-reduced-motion: reduce) {
+  .rtk-ring[data-state="open"], .rtk-ring[data-state="open"] .rtk-item, .rtk-ring[data-state="open"] .rtk-label, .rtk-ring[data-state="open"] .rtk-svg { animation: rtk-lab 100ms ease-out both !important; }
+  .rtk-ring[data-state="closing"] .rtk-item, .rtk-ring[data-state="closing"] .rtk-svg { transform: translate(var(--x, 0), var(--y, 0)); transition: opacity 100ms; }
+  .rtk-wedge { transition: none; }
+}

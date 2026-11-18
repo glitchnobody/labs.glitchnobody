@@ -1,0 +1,8 @@
+/* card hit areas: only the round canvas reacts, the square root's corners open the card */
+.card .dgl {
+  pointer-events: none;
+}
+
+.card .dgl-cv {
+  pointer-events: auto;
+}

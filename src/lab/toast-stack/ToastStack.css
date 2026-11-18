@@ -1,0 +1,296 @@
+/* Toast stack: every toast sits at the anchor and is placed by a transform. */
+.ts {
+  --spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 20.4%, 1.077 25%, 1.086 28.4%, 1.075 31.9%, 1.009 43.6%, 0.995 50.2%, 0.996 63.4%, 1);
+  display: inline-block;
+  padding: 12px; /* room for the clear-all × on the corner */
+  font-family: var(--font-ui);
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none; /* the padding and slivers' sides are air: only toasts, buttons and the open list react */
+}
+
+.ts-list {
+  position: relative;
+  width: var(--w);
+  height: var(--box);
+  transition: height 300ms var(--spring);
+}
+.ts[data-snap] .ts-list {
+  transition: none;
+}
+
+/* while unfolded, the list's whole box (gaps included) keeps it open */
+.ts-zone {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: var(--zone);
+}
+.ts[data-position="bottom"] .ts-zone {
+  bottom: 0;
+}
+.ts[data-position="top"] .ts-zone {
+  top: 0;
+}
+.ts[data-expanded] .ts-zone {
+  pointer-events: auto;
+}
+
+.ts-toast {
+  position: absolute;
+  left: 0;
+  width: var(--w);
+  z-index: var(--z);
+  transform: translateY(var(--ty)) scale(var(--s));
+  transition:
+    transform 300ms var(--spring),
+    opacity 200ms var(--ease);
+  touch-action: pan-y;
+  pointer-events: auto;
+  outline: none;
+}
+.ts[data-position="bottom"] .ts-toast {
+  bottom: 0;
+  transform-origin: 50% 0;
+}
+.ts[data-position="top"] .ts-toast {
+  top: 0;
+  transform-origin: 50% 100%;
+}
+.ts[data-click] .ts-toast {
+  cursor: pointer;
+}
+.ts-toast[data-hidden] {
+  opacity: 0;
+  pointer-events: none;
+}
+.ts-toast[data-leave] {
+  pointer-events: none;
+}
+.ts[data-snap] .ts-toast,
+.ts[data-snap] .ts-clear {
+  transition: none;
+}
+
+.ts-body {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--r);
+  background: var(--fill-slab);
+  box-shadow: var(--shadow-float);
+  color: var(--fill-on);
+  translate: 0 0;
+  transition:
+    translate 300ms var(--spring),
+    scale var(--leave) var(--ease),
+    opacity 200ms var(--ease),
+    background-color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
+}
+.ts-toast:focus-visible .ts-body {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+.ts[data-tint] .ts-body {
+  background: color-mix(in srgb, var(--kind) 8%, var(--fill-slab));
+  box-shadow:
+    var(--shadow-float),
+    0 0 0 1px color-mix(in srgb, var(--kind) 25%, transparent);
+}
+[data-stroke="on"] .ts .ts-body {
+  box-shadow:
+    var(--shadow-float),
+    0 0 0 1px var(--pane-edge);
+}
+
+.ts-toast[data-drag] .ts-body {
+  translate: var(--dx) 0;
+  opacity: var(--o);
+  transition: none;
+}
+.ts-toast[data-leave="fly"] .ts-body {
+  translate: calc(var(--dx) + var(--dir) * (var(--w) + 60px)) 0;
+  opacity: 0;
+  transition:
+    translate var(--leave) cubic-bezier(0.4, 0, 1, 1) var(--delay),
+    opacity var(--leave) var(--ease) var(--delay);
+}
+.ts-toast[data-leave="shrink"] .ts-body {
+  scale: 0.9;
+  opacity: 0;
+  transition:
+    scale var(--leave) var(--ease),
+    opacity var(--leave) var(--ease);
+}
+
+/* refilled toasts slide in from the anchor side */
+.ts-toast[data-enter] .ts-body {
+  animation: ts-in 300ms var(--spring) both;
+}
+.ts[data-position="top"] .ts-toast[data-enter] .ts-body {
+  animation-name: ts-in-top;
+}
+@keyframes ts-in {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+@keyframes ts-in-top {
+  from {
+    transform: translateY(-24px);
+    opacity: 0;
+  }
+}
+
+.ts-icon {
+  font-size: 20px;
+  color: var(--kind);
+}
+.ts-text {
+  min-width: 0;
+}
+.ts-title,
+.ts-desc {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ts-title {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--fill-on);
+}
+.ts-desc {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+/* toasts behind the front one hide their text, so the slivers read as clean edges */
+.ts-icon,
+.ts-text {
+  transition: opacity 300ms var(--ease);
+}
+.ts-toast[data-behind] .ts-icon,
+.ts-toast[data-behind] .ts-text {
+  opacity: 0;
+}
+
+.ts-close,
+.ts-clear {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ts-close:focus-visible,
+.ts-clear:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* the per-toast × shows in the list, on the toast under the pointer or with focus */
+.ts-close {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-control);
+  background: none;
+  color: var(--ink-4);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease),
+    background-color var(--t-fast) var(--ease);
+}
+.ts[data-expanded] .ts-toast[data-hot] .ts-close,
+.ts[data-expanded] .ts-toast:focus-within .ts-close {
+  opacity: 1;
+  pointer-events: auto;
+}
+.ts-close:hover {
+  color: var(--ink-2);
+  background: var(--surface-2);
+}
+
+.ts-clear {
+  position: absolute;
+  left: -8px;
+  z-index: 20;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--fill-slab);
+  box-shadow: var(--shadow-raised);
+  color: var(--ink-3);
+  pointer-events: auto;
+  transform: translateY(var(--edge));
+  transition:
+    transform 300ms var(--spring),
+    opacity var(--t-base) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+.ts[data-position="bottom"] .ts-clear {
+  bottom: -8px;
+}
+.ts[data-position="top"] .ts-clear {
+  top: -8px;
+}
+.ts-clear:hover {
+  color: var(--fill-on);
+}
+.ts-clear[data-gone] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* reduced motion: no springs or flights; layouts cross-fade, toasts fade out and in */
+@keyframes ts-fade-a {
+  from {
+    opacity: 0.2;
+  }
+}
+@keyframes ts-fade-b {
+  from {
+    opacity: 0.2;
+  }
+}
+@keyframes ts-fade {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-toast,
+  .ts-clear {
+    transition: opacity 150ms var(--ease);
+  }
+  .ts-body,
+  .ts-toast[data-leave] .ts-body {
+    translate: 0 0;
+    scale: 1;
+    transition: opacity 150ms var(--ease) var(--delay, 0ms);
+  }
+  .ts-toast[data-drag] .ts-body {
+    translate: var(--dx) 0;
+  }
+  .ts-toast[data-enter] .ts-body,
+  .ts[data-position="top"] .ts-toast[data-enter] .ts-body {
+    animation: ts-fade 150ms var(--ease) both;
+  }
+  /* switching between two identical animations restarts it on every fold and unfold */
+  .ts[data-expanded] .ts-list {
+    animation: ts-fade-a 150ms var(--ease);
+  }
+  .ts:not([data-expanded]) .ts-list {
+    animation: ts-fade-b 150ms var(--ease);
+  }
+}

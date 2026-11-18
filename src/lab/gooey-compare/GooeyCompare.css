@@ -1,0 +1,159 @@
+/* Gooey compare: one picture, its filtered copy clipped by a curved edge, a line and a handle on top. */
+.gc {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--card);
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  font-family: var(--font-ui);
+}
+
+.gc[data-vertical] {
+  cursor: ns-resize;
+}
+
+[data-stroke="on"] .gc {
+  box-shadow: 0 0 0 1px var(--pane-edge);
+}
+
+.gc-img,
+.gc-before,
+.gc-tint {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gc-img {
+  display: block;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.gc-before {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.gc[data-treatment="grayscale"] .gc-before .gc-img {
+  filter: grayscale(1);
+}
+
+.gc[data-treatment="sepia"] .gc-before .gc-img {
+  filter: sepia(0.8) contrast(1.05);
+}
+
+/* zoomed a little so the blurred edges never show */
+.gc[data-treatment="blur"] .gc-before .gc-img {
+  filter: blur(6px);
+  transform: scale(1.05);
+}
+
+.gc[data-treatment="duotone"] .gc-before .gc-img {
+  filter: grayscale(1);
+}
+
+.gc-tint {
+  background: var(--pick);
+  mix-blend-mode: color;
+}
+
+/* the edge line is white with a dark hairline shadow: it sits on a picture, not on a token surface */
+.gc-line {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.gc-line path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
+}
+
+.gc-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--fill-slab);
+  color: var(--fill-on);
+  box-shadow: var(--shadow-raised);
+  cursor: grab;
+  transition: box-shadow var(--t-fast) var(--ease);
+  will-change: transform;
+}
+
+.gc[data-dragging] .gc-handle {
+  box-shadow: var(--shadow-float);
+  cursor: grabbing;
+}
+
+[data-stroke="on"] .gc-handle {
+  box-shadow: var(--shadow-raised), 0 0 0 1px var(--pane-edge);
+}
+
+[data-stroke="on"] .gc[data-dragging] .gc-handle {
+  box-shadow: var(--shadow-float), 0 0 0 1px var(--pane-edge);
+}
+
+.gc-handle:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.gc-pill {
+  position: absolute;
+  top: 8px;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--fill-slab) 80%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--fill-on);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: opacity var(--t-base) var(--ease);
+}
+
+.gc-pill-before {
+  left: 8px;
+}
+
+.gc-pill-after {
+  right: 8px;
+}
+
+.gc[data-vertical] .gc-pill-after {
+  top: auto;
+  right: auto;
+  bottom: 8px;
+  left: 8px;
+}
+
+.gc-pill[data-hidden] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gc-pill {
+    transition-duration: 150ms;
+  }
+}

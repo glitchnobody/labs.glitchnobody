@@ -1,0 +1,47 @@
+.smz { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; width: var(--smz-max); font-family: var(--font-ui); color: var(--fill-on); user-select: none; }
+.smz-ruler { align-self: stretch; display: flex; flex-direction: column; gap: 6px; }
+.smz-stops { display: flex; justify-content: space-between; }
+.smz-stop {
+  display: flex; flex-direction: column; gap: 2px; padding: 2px 4px; margin: -2px -4px; border: 0; background: none; cursor: pointer;
+  font: inherit; font-size: 11px; line-height: 14px; color: var(--ink-4); border-radius: var(--r-control); transition: color 160ms;
+}
+.smz-stop:nth-child(1) { align-items: flex-start; }
+.smz-stop:nth-child(2) { align-items: center; }
+.smz-stop:nth-child(3) { align-items: flex-end; }
+.smz-stop[data-on="true"] > span { color: var(--fill-on); }
+.smz-stop small { font-size: 11px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
+.smz-stop:hover > span { color: var(--ink-2); }
+.smz-stop:focus-visible, .smz-handle:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
+.smz-line { position: relative; height: 7px; margin: 0 3px; }
+.smz-line::before { content: ""; position: absolute; left: 0; right: 0; top: 3px; height: 1px; background: var(--pane-edge); }
+.smz-line i { position: absolute; top: 1px; width: 1px; height: 5px; background: var(--ink-4); }
+.smz-line i:nth-child(1) { left: 0; }
+.smz-line i:nth-child(2) { left: 50%; }
+.smz-line i:nth-child(3) { right: 0; }
+.smz-line b {
+  position: absolute; top: 0; left: var(--smz-dot); width: 7px; height: 7px; margin-left: -3px; border-radius: 50%; background: var(--fill-on);
+  transition: left 260ms cubic-bezier(.2,.7,.2,1);
+}
+.smz-card {
+  position: relative; box-sizing: border-box; padding: 12px 20px 12px 12px; border-radius: var(--r-panel);
+  background: var(--fill-slab); box-shadow: var(--shadow-raised); user-select: text;
+}
+[data-theme="dark"] .smz-card { box-shadow: 0 0 0 1px var(--pane-edge); }
+[data-stroke="on"] .smz-card { box-shadow: var(--shadow-raised), 0 0 0 1px var(--pane-edge); }
+.smz-head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 4px; font-size: 11px; line-height: 14px; }
+.smz-head > span { animation: smz-fade 200ms ease-out; }
+.smz-head > span:first-child { color: var(--ink-3); }
+.smz-head > span:last-child { color: var(--ink-4); font-variant-numeric: tabular-nums; }
+.smz-body { position: relative; font-size: 12px; line-height: 1.5; overflow: hidden; overflow-wrap: break-word; }
+.smz-body [data-k] { display: inline-block; }
+.smz-ghost { position: absolute; white-space: nowrap; pointer-events: none; animation: smz-out 160ms ease-in forwards; }
+.smz-handle {
+  position: absolute; top: 50%; right: 4px; width: 6px; height: 22px; margin-top: -11px; border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--fill-on) 20%, transparent); cursor: ew-resize; touch-action: none; transition: background 120ms;
+}
+.smz-handle::before { content: ""; position: absolute; inset: -8px -6px; }
+.smz-handle:hover, .smz-card[data-drag="true"] .smz-handle { background: var(--pick); }
+.smz-hint { margin: 0; font-size: 11px; color: var(--ink-4); }
+@keyframes smz-out { to { opacity: 0; filter: blur(4px); } }
+@keyframes smz-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .smz-line b { transition: none; } .smz-head > span { animation-duration: 120ms; } }

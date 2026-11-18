@@ -1,0 +1,182 @@
+/* Jelly slider: a 300 × 52 pill; the SVG overflows 12 px above and below so the wobble can bulge out. */
+.jly {
+  --accent: var(--pick);
+  --accent-on: white;
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  font-family: var(--font-ui);
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.jly[data-accent="ok"] {
+  --accent: var(--ok);
+}
+
+.jly[data-accent="danger"] {
+  --accent: var(--danger);
+}
+
+.jly[data-accent="ink"] {
+  --accent: var(--fill-on);
+  --accent-on: var(--on-ink);
+}
+
+.jly-svg {
+  position: absolute;
+  top: calc(-1 * var(--pad));
+  left: 0;
+  width: 100%;
+  height: calc(100% + 2 * var(--pad));
+  overflow: visible;
+}
+
+.jly-svg * {
+  pointer-events: none;
+}
+
+.jly-track {
+  fill: color-mix(in srgb, var(--fill-on) 14%, var(--fill-slab));
+  pointer-events: visiblePainted;
+}
+
+.jly-stop-a {
+  stop-color: var(--accent);
+}
+
+.jly-stop-b {
+  stop-color: color-mix(in srgb, var(--accent) 70%, white);
+}
+
+.jly-glow {
+  opacity: 0;
+}
+
+.jly-glow-a {
+  stop-color: white;
+  stop-opacity: 0.9;
+}
+
+.jly-glow-b {
+  stop-color: white;
+  stop-opacity: 0;
+}
+
+.jly-edge {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 1;
+}
+
+[data-stroke="on"] .jly-edge {
+  stroke: var(--pane-edge);
+}
+
+.jly:focus-visible .jly-edge {
+  stroke: var(--focus);
+  stroke-width: 1.5;
+}
+
+/* the number: in ink over the track, and again in white clipped to the fill */
+.jly-label {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  height: var(--h);
+  display: flex;
+  align-items: center;
+  color: var(--fill-on);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.jly-light {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.jly-light .jly-label {
+  color: var(--accent-on);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 25%);
+}
+
+.jly[data-accent="ink"] .jly-light .jly-label {
+  text-shadow: none;
+}
+
+.jly-num {
+  display: flex;
+  align-items: baseline;
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.jly-slot {
+  position: relative;
+  display: inline-block;
+}
+
+.jly-d {
+  display: inline-block;
+}
+
+.jly-pct {
+  margin-left: 2px;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.jly[data-blur] .jly-d[data-in] {
+  animation: jly-in 180ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.jly-out {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+}
+
+.jly[data-blur] .jly-out {
+  display: inline-block;
+  animation: jly-out 180ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes jly-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(25%) scale(0.85);
+  }
+}
+
+@keyframes jly-out {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(-25%) scale(0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jly[data-blur] .jly-d[data-in] {
+    animation: none;
+  }
+
+  .jly[data-blur] .jly-out {
+    display: none;
+  }
+}

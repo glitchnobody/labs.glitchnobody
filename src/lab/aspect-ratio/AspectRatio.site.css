@@ -1,0 +1,9 @@
+/* card hit areas: only the photo, the tile and the open menu catch the pointer; empty stage and the title open the modal */
+.card .ar {
+  pointer-events: none;
+}
+
+.card .ar-photo,
+.card .ar-tile {
+  pointer-events: auto;
+}

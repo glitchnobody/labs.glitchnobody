@@ -22,3 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+# Local secrets written by `elevenlabs onboard`
+/.env.local
+
+# orchestrator tools and briefs for build agents
+.agents-work/

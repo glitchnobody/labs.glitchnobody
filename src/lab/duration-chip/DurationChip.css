@@ -1,0 +1,25 @@
+.dch { display: inline-flex; gap: 6px; font-family: var(--font-ui); position: relative; }
+.dch-pill {
+  --dch-bg: var(--fill-slab); box-shadow: var(--shadow-raised);
+  height: 38px; display: inline-flex; align-items: center; gap: 6px;
+  background: var(--dch-bg); border: 0; padding: 0 12px; color: var(--fill-on);
+  font: inherit; cursor: pointer; user-select: none; white-space: nowrap;
+}
+.dch-chip { gap: 8px; }
+.dch-chip:focus-visible, .dch-save:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
+.dch-part { display: inline-flex; align-items: baseline; gap: 4px; }
+.dch-num { font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--fill-on); display: inline-flex; }
+.dch-unit { font-size: 13px; font-weight: 400; color: var(--ink-4); }
+.dch-icon { display: inline-flex; color: var(--ink-3); }
+.dch-icon-on { color: var(--fill-on); }
+.dch-field { width: 72px; padding: 0 12px; cursor: text; justify-content: space-between; }
+.dch-field:focus-within { box-shadow: 0 0 0 1.5px var(--fill-on); }
+.dch-save { width: 38px; padding: 0; justify-content: center; }
+.dch-shake { display: inline-flex; }
+.dch-input {
+  all: unset; box-sizing: content-box; font-size: 14px; font-weight: 500; color: var(--fill-on);
+  font-variant-numeric: tabular-nums; min-width: 0;
+}
+.dch-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+[data-stroke="on"] .dch-pill { box-shadow: 0 0 0 1px var(--pane-edge); }
+[data-stroke="on"] .dch-field:focus-within { box-shadow: 0 0 0 1.5px var(--fill-on); }

@@ -1,0 +1,53 @@
+import type { Meta } from "..";
+import "./VoiceChat.css";
+
+const AV = [1, 3, 6, 12, 15, 21, 24, 30, 37, 44, 50, 18];
+
+export default {
+  name: "Voice chat",
+  description: "A voice room in a small pill of avatars. Press it to open the room, watch who is speaking, join and unmute, then fold it back up.",
+  tag: "Press",
+  install: "npm install motion @iconify/react",
+  sounds: ["expand", "collapse", "join", "leave", "tick"],
+  siteProps: { avatars: AV.map((n) => `/lab/avatars/${String(n).padStart(2, "0")}.webp`), me: "/lab/avatars/you.svg" },
+  demo: [
+    { move: [1.2, 1.5], ms: 0 },
+    { move: [0.857, 0.5], ms: 600 },
+    { down: true },
+    { up: true },
+    { wait: 900 },
+    { move: [0.5, 0.81], ms: 500 },
+    { down: true },
+    { up: true },
+    { wait: 600 },
+    { move: [0.109, 0.81], ms: 300 },
+    { down: true },
+    { up: true },
+    { wait: 800 },
+    { move: [0.928, 0.088], ms: 500 },
+    { down: true },
+    { up: true },
+    { wait: 600 },
+    { move: [1.2, 1.5], ms: 500 },
+  ],
+  knobs: [
+    { prop: "people", label: "People", type: "range", min: 3, max: 12, default: 7 },
+    { prop: "visible", label: "In the pill", type: "range", min: 2, max: 6, default: 4 },
+    { prop: "columns", label: "Grid columns", type: "range", min: 3, max: 5, default: 4 },
+    { prop: "overlap", label: "Overlap (%)", type: "range", min: 0, max: 40, default: 10 },
+    { prop: "size", label: "Avatar (px)", type: "range", min: 28, max: 56, default: 40 },
+    { prop: "names", label: "Show names", type: "toggle", default: true },
+    { prop: "title", label: "Title", type: "text", maxLength: 24, default: "Voice Chat" },
+    { prop: "button", label: "Button", type: "text", maxLength: 16, default: "Join Now" },
+    { prop: "note", label: "Note", type: "text", maxLength: 40, default: "Mic will be muted initially." },
+    { prop: "speaking", label: "Speaking", type: "toggle", default: true },
+    { prop: "turn", label: "Speaker change (s)", type: "range", min: 1, max: 6, step: 0.5, default: 2.5 },
+    { prop: "bounce", label: "Bounce", type: "range", min: 0, max: 100, default: 25 },
+    { prop: "speed", label: "Speed", type: "range", min: 0, max: 100, default: 60 },
+    { prop: "stagger", label: "Stagger (ms)", type: "range", min: 0, max: 80, step: 5, default: 25 },
+    { prop: "hoverOpen", label: "Open on hover", type: "toggle", default: false },
+    { prop: "sound", label: "Sound", type: "toggle", default: true },
+    { prop: "volume", label: "Volume", type: "range", min: 0, max: 100, default: 70 },
+  ],
+  load: () => import("./VoiceChat").then((m) => m.VoiceChat),
+} satisfies Meta;

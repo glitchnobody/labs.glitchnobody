@@ -1,0 +1,143 @@
+/* Coupon copy: a pill with a code layer and a copied layer stacked on each other. */
+.cc {
+  --blur: 8px;
+  position: relative;
+  width: 230px;
+  height: 48px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--fill-on) 7%, var(--fill-slab));
+  font-family: var(--font-ui);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-stroke="on"] .cc {
+  box-shadow: inset 0 0 0 1px var(--pane-edge);
+}
+
+.cc-fill {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--fill-on) 5%, transparent);
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: cc-sweep var(--hold) linear forwards;
+  transition: opacity 180ms var(--ease);
+  pointer-events: none;
+}
+
+.cc:not([data-state="copied"]) .cc-fill {
+  opacity: 0;
+}
+
+.cc[data-accent="Ok"] .cc-fill,
+.cc[data-accent="Pick"] .cc-fill {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+@keyframes cc-sweep {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.cc-code,
+.cc-done {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  transition: opacity 180ms var(--ease), filter 180ms var(--ease);
+}
+
+.cc-code {
+  justify-content: space-between;
+  padding: 0 6px 0 20px;
+}
+
+.cc-text {
+  color: var(--ink-3);
+  font-size: var(--code-size);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  user-select: text;
+}
+
+.cc-btn {
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--fill-slab);
+  box-shadow: var(--shadow-raised);
+  color: var(--fill-on);
+  font: 500 13px/18px var(--font-ui);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background var(--t-fast) var(--ease);
+}
+
+.cc-btn:hover {
+  background: var(--surface);
+}
+
+.cc-done {
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fill-on);
+  font: 500 14px/20px var(--font-ui);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.cc-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+.cc-btn:focus-visible,
+.cc-done:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: -3px;
+}
+
+.cc[data-state="copied"] .cc-code,
+.cc:not([data-state="copied"]) .cc-done {
+  opacity: 0;
+  filter: blur(var(--blur));
+  pointer-events: none;
+}
+
+.cc-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cc-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc {
+    --blur: 0px;
+  }
+  .cc-code,
+  .cc-done {
+    transition-duration: 120ms;
+  }
+}

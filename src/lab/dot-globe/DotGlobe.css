@@ -1,0 +1,35 @@
+/* Dot globe: a round canvas of dots, the root is exactly the globe's box. */
+.dgl {
+  position: relative;
+  display: block;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dgl:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.dgl-cv {
+  display: block;
+  width: 100%;
+  height: 100%;
+  clip-path: circle(50%); /* hit testing follows the globe, corners fall through */
+  touch-action: none;
+  cursor: grab;
+}
+
+.dgl-cv:active {
+  cursor: grabbing;
+}
+
+.dgl-probe {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}

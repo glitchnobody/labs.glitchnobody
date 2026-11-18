@@ -1,0 +1,9 @@
+/* Card hit areas: only the two halves (and the open menu) react; the reserved space is the card link. */
+.card .sb {
+  pointer-events: none;
+}
+.card .sb-main,
+.card .sb-caret,
+.card .sb[data-open] .sb-menu {
+  pointer-events: auto;
+}

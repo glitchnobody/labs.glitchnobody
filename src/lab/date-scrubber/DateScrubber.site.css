@@ -1,0 +1,3 @@
+.card .dsc { pointer-events: none; }
+.card .dsc-ruler, .card .dsc-date, .card .dsc-today { pointer-events: auto; }
+.card .dsc-today[data-show="false"] { pointer-events: none; }

@@ -1,0 +1,43 @@
+import type { Meta } from "..";
+import "./Dropdown.css";
+
+export default {
+  name: "Dropdown",
+  description: "A select that grows out of its own trigger. Open it, type to filter, glide over the options and pick one; the trigger rolls to the new value.",
+  tag: "Select",
+  install: "npm install @iconify/react",
+  sounds: ["expand", "collapse", "tick"],
+  demo: [
+    { move: [1.25, 0.5], ms: 0 },
+    { move: [0.5, 0.667], ms: 500 },
+    { down: true },
+    { up: true },
+    { wait: 700 },
+    { move: [0.5, 0.8], ms: 900 },
+    { down: true },
+    { up: true },
+    { wait: 600 },
+    { move: [0.5, 0.667], ms: 400 },
+    { down: true },
+    { up: true },
+    { wait: 700 },
+    { move: [0.5, 0.365], ms: 600 },
+    { down: true },
+    { up: true },
+    { wait: 500 },
+    { move: [1.25, 0.5], ms: 500 },
+  ],
+  knobs: [
+    { prop: "multi", label: "Multi-select", type: "toggle", default: false },
+    { prop: "search", label: "Search", type: "toggle", default: true },
+    { prop: "groups", label: "Groups", type: "toggle", default: true },
+    { prop: "icons", label: "Icons", type: "toggle", default: true },
+    { prop: "width", label: "Width (px)", type: "range", min: 160, max: 300, default: 220 },
+    { prop: "rows", label: "Visible rows", type: "range", min: 4, max: 10, default: 7 },
+    { prop: "radius", label: "Corner (px)", type: "range", min: 4, max: 20, default: 10 },
+    { prop: "speed", label: "Speed", type: "select", options: ["Snappy", "Smooth", "Slow"], default: "Smooth" },
+    { prop: "sound", label: "Sound", type: "toggle", default: true },
+    { prop: "volume", label: "Volume", type: "range", min: 0, max: 100, default: 70 },
+  ],
+  load: () => import("./Dropdown").then((m) => m.Dropdown),
+} satisfies Meta;
