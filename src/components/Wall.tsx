@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { blocks } from "../lab";
+import { Icon } from "@iconify/react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { blocks, type Meta } from "../lab";
 import { runDemo } from "../lab/demo";
 import Block from "./Block";
 
@@ -8,7 +9,18 @@ const tags = [...new Set(list.map(([, m]) => m.tag))].sort();
 
 /* the wall: every component on a card. Clicking a card's empty space or its
    settings button opens the modal (the link is handled by the root route) */
-export default function Wall() {
+export default function Wall({
+	items = list,
+	title = "components",
+	intro = "Interactive components you can play with right here. Open one to tune its settings and take the code.",
+	bare = false,
+}: {
+	items?: [string, Meta][];
+	title?: string;
+	intro?: ReactNode;
+	/* just the cards: no title and no filter chips (the home page's section) */
+	bare?: boolean;
+} = {}) {
 	const [tag, setTag] = useState("");
 	const wall = useRef<HTMLElement>(null);
 
@@ -46,14 +58,15 @@ export default function Wall() {
 
 	return (
 		<>
-			<section className="hero">
-				<h1>labs</h1>
-				<p>
-					Interactive components you can play with right here. Open one to tune
-					its settings and take the code.
-				</p>
-			</section>
+			{!bare && (
+				<section className="hero">
+					<h1>{title}</h1>
+					<p>{intro}</p>
+				</section>
+			)}
 
+			{!bare && (
+				<>
 			{/* biome-ignore lint/a11y/useSemanticElements: a fieldset would bring its own border and legend styling */}
 			<div
 				className="chips"
@@ -73,8 +86,11 @@ export default function Wall() {
 				))}
 			</div>
 
+				</>
+			)}
+
 			<main className="wall" ref={wall}>
-				{list.map(([slug, m]) => (
+				{items.map(([slug, m]) => (
 					<article
 						key={slug}
 						className="card"
@@ -82,16 +98,14 @@ export default function Wall() {
 						data-shortcut-scope
 						hidden={!!tag && m.tag !== tag}
 					>
-						<a className="card-open" href={`/${slug}`} data-block={slug}>
+						<a className="card-open" href={`/components/${slug}`} data-block={slug}>
 							<span className="card-name">{m.name}</span>
 						</a>
 						<div className="card-block">
 							<Block slug={slug} />
 						</div>
 						<span className="cursor" aria-hidden="true">
-							<svg viewBox="0 0 24 24" aria-hidden="true">
-								<path d="M5 3.2v15.6l4.2-3.9 2.7 6.1 2.8-1.2-2.7-6H18L5 3.2Z" />
-							</svg>
+							<Icon icon="ph:cursor-fill" />
 						</span>
 						<div className="card-tools">
 							{m.demo && (
@@ -101,46 +115,18 @@ export default function Wall() {
 									data-play={slug}
 									aria-label={`Play a demo of ${m.name}`}
 								>
-									<svg
-										viewBox="0 0 24 24"
-										className="when-idle"
-										aria-hidden="true"
-									>
-										<path
-											d="M8 5.5v13l11-6.5-11-6.5Z"
-											fill="currentColor"
-											stroke="none"
-										/>
-									</svg>
-									<svg
-										viewBox="0 0 24 24"
-										className="when-playing"
-										aria-hidden="true"
-									>
-										<rect
-											x="7"
-											y="7"
-											width="10"
-											height="10"
-											rx="1.5"
-											fill="currentColor"
-											stroke="none"
-										/>
-									</svg>
+									<Icon icon="ph:play-fill" className="when-idle" />
+									<Icon icon="ph:stop-fill" className="when-playing" />
 								</button>
 							)}
 							{/* biome-ignore lint/a11y/useAnchorContent: labelled by aria-label; the icon is decorative */}
 							<a
 								className="icon"
-								href={`/${slug}`}
+								href={`/components/${slug}`}
 								data-block={slug}
 								aria-label={`Open ${m.name} settings`}
 							>
-								<svg viewBox="0 0 24 24" aria-hidden="true">
-									<path d="M4 8h9m4 0h3M4 16h3m4 0h9" />
-									<circle cx="15" cy="8" r="2" />
-									<circle cx="9" cy="16" r="2" />
-								</svg>
+								<Icon icon="ph:sliders-horizontal" />
 							</a>
 						</div>
 					</article>

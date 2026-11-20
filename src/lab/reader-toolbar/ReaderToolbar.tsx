@@ -125,12 +125,13 @@ export function ReaderToolbar({
   };
 
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-      return;
-    }
-    if (open) groupRef.current?.querySelector<HTMLElement>("button")?.focus();
-    else if (groupRef.current?.contains(document.activeElement) || document.activeElement === document.body) moreRef.current?.focus();
+    /* only a real open/close moves focus: not the first render, and not React's dev double-run,
+       which would otherwise pull the page to this component on every load */
+    if (mounted.current === open) return;
+    mounted.current = open;
+    const keep = { preventScroll: true };
+    if (open) groupRef.current?.querySelector<HTMLElement>("button")?.focus(keep);
+    else if (groupRef.current?.contains(document.activeElement)) moreRef.current?.focus(keep);
   }, [open]);
 
   const press = (e: React.MouseEvent<HTMLButtonElement>, fn?: () => void) => {

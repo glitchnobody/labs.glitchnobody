@@ -1,17 +1,84 @@
-/* The showcase shell, styled by DESIGN.md. Colours, radii, shadows and
-   motion come from lab/tokens.css, so the shell and the blocks change
-   theme together. */
+/* The showcase shell. Its colours, radii and motion are its own (--s-*), taken
+   from cosmos.so's own CSS tokens on 2026-11-20 (see DESIGN.md, "Base site vs components"). The 60
+   components never read these: they keep lab/tokens.css. */
 :root {
   --gutter: 12px;
+  --edge: 24px; /* page margin left and right on desktop and tablet */
   --column: 1920px;
+
+  --s-r-menu: 12px;
+  --s-r-row: 8px;
+  --s-r-panel: 12px;
+  --s-r-media: 8px;
+  --s-ease-ui: cubic-bezier(0.4, 0, 0.2, 1); /* what cosmos.so's controls use */
+  --s-ease-popover: cubic-bezier(0.16, 1, 0.3, 1);
+  --s-dur-fast: 150ms;
+  --s-dur-med: 180ms;
 }
 
-/* named again wherever the theme is set, so a stage with its own Fill
-   resolves them against its own colours and not the page's */
+/* named again wherever the theme is set, so the modal stage's own theme flips them too */
 :root,
-[data-theme] {
-  --stage: var(--card);
-  --raised: var(--surface-2);
+[data-theme="light"] {
+  --s-bg: #ffffff;
+  --s-card: #fcfbfa;
+  --s-surface: #f2f1f0;
+  --s-surface-hover: #e8e6e4;
+  --s-outline-hover: #e8e6e4;
+  --s-elevated: #fcfbfa; /* menus and popovers sit on light-elevation */
+  --s-border: rgb(13 13 13 / 0.12);
+  --s-border-strong: rgb(92 87 84 / 0.18);
+  --s-ink: #0d0d0d;
+  --s-ink-2: #6e6a69;
+  --s-ink-3: #9a9796;
+  --s-cta: #0d0d0d;
+  --s-cta-hover: #232323;
+  --s-cta-ink: #ffffff;
+  --s-shadow-menu: 0 10px 28px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  --s-bg: #141414;
+  --s-card: #212020;
+  --s-surface: #323131;
+  --s-surface-hover: #3e3d3d;
+  --s-outline-hover: #212020;
+  --s-elevated: #212020;
+  --s-border: rgb(247 245 243 / 0.12);
+  --s-border-strong: rgb(248 245 242 / 0.2);
+  --s-ink: #ffffff;
+  --s-ink-2: #aeabab;
+  --s-ink-3: #918f8f;
+  --s-cta: #ffffff;
+  --s-cta-hover: #e8e6e4;
+  --s-cta-ink: #0d0d0d;
+  --s-shadow-menu: 0 12px 32px rgba(0, 0, 0, 0.32);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --s-bg: #141414;
+    --s-card: #212020;
+    --s-surface: #323131;
+    --s-surface-hover: #3e3d3d;
+    --s-outline-hover: #212020;
+    --s-elevated: #212020;
+    --s-border: rgb(247 245 243 / 0.12);
+    --s-border-strong: rgb(248 245 242 / 0.2);
+    --s-ink: #ffffff;
+    --s-ink-2: #aeabab;
+    --s-ink-3: #918f8f;
+    --s-cta: #ffffff;
+    --s-cta-hover: #e8e6e4;
+    --s-cta-ink: #0d0d0d;
+    --s-shadow-menu: 0 12px 32px rgba(0, 0, 0, 0.32);
+  }
+}
+
+/* components inherit their text colour from their own tokens, not the shell's */
+.card-block,
+.stage-block,
+.sfx-example {
+  color: var(--ink);
 }
 
 *,
@@ -21,9 +88,9 @@
 }
 
 html {
-  background: var(--bg);
+  background: var(--s-bg);
   isolation: isolate;
-  color: var(--ink);
+  color: var(--s-ink);
   font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
 }
@@ -31,6 +98,8 @@ html {
 body {
   margin: 0;
   min-height: 100dvh;
+  padding-inline: var(--edge);
+  overflow-x: clip; /* the full-bleed header rule is 100vw, wider than the page when a scrollbar shows */
 }
 
 a {
@@ -48,7 +117,7 @@ button {
 }
 
 :focus-visible {
-  outline: 1.5px solid var(--focus);
+  outline: 1.5px solid var(--s-ink-3);
   outline-offset: 2px;
 }
 
@@ -73,51 +142,78 @@ body::before {
   position: fixed;
   inset: 0 0 0 50%;
   z-index: -1;
-  width: min(var(--column), 100%);
+  width: min(var(--column), calc(100% - 2 * var(--edge)));
   translate: -50% 0;
-  border-inline: 1px solid var(--hairline);
+  border-inline: 1px dashed var(--s-border);
   pointer-events: none;
-}
-
-/* a joint dot where a horizontal rule meets a rail */
-.top::before,
-.top::after {
-  content: "";
-  position: absolute;
-  bottom: -3px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--ink-5);
-}
-
-.top::before {
-  left: -3px;
-}
-
-.top::after {
-  right: -3px;
 }
 
 /* ── header ───────────────────────────────────────────── */
 .top {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 280px) 1fr;
   align-items: center;
   gap: 8px;
   height: 64px;
-  border-bottom: 1px solid var(--hairline);
+}
+
+.top .search {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.top-end {
+  display: flex;
+  justify-self: end;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings {
+  position: relative;
+}
+
+.settings summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.settings summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 5;
+  width: 240px;
+  border-radius: var(--s-r-panel);
+  background: var(--s-elevated);
+  box-shadow: var(--s-shadow-menu);
+}
+
+/* the header rule runs edge to edge, past the rails */
+.top::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  translate: -50% 0;
+  border-bottom: 1px dashed var(--s-border);
+  pointer-events: none;
 }
 
 .brand {
-  margin-right: auto;
   font-size: 15px;
   font-weight: 500;
   letter-spacing: -0.005em;
 }
 
 .brand span {
-  color: var(--ink-3);
+  color: var(--s-ink-3);
   font-weight: 400;
 }
 
@@ -128,14 +224,14 @@ body::before {
   place-items: center;
   height: 36px;
   border-radius: var(--r-pill);
-  background: var(--stage);
-  color: var(--ink-2);
+  background: var(--s-surface);
+  color: var(--s-ink-2);
   font-size: 14px;
   font-weight: 400;
   transition:
-    background-color var(--t-fast) var(--ease),
-    color var(--t-fast) var(--ease),
-    box-shadow var(--t-fast) var(--ease);
+    background-color var(--s-dur-fast) var(--s-ease-ui),
+    color var(--s-dur-fast) var(--s-ease-ui),
+    box-shadow var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .pill {
@@ -149,8 +245,8 @@ body::before {
 
 .pill:hover,
 .icon:hover {
-  background: var(--raised);
-  color: var(--ink);
+  background: var(--s-surface-hover);
+  color: var(--s-ink);
 }
 
 .icon svg,
@@ -158,17 +254,13 @@ body::before {
 .sec summary > svg {
   width: 18px;
   height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
 }
 
 kbd {
   font: inherit;
   font-size: 12px;
-  color: var(--ink-3);
+  color: var(--s-ink-3);
 }
 
 /* ── wall ─────────────────────────────────────────────── */
@@ -182,7 +274,7 @@ kbd {
 .hero h1 {
   margin: 0 0 0 -0.04em;
   font-size: clamp(5rem, 19vw, 15rem);
-  font-weight: 300;
+  font-weight: 500;
   line-height: 0.8;
   letter-spacing: -0.06em;
 }
@@ -190,7 +282,7 @@ kbd {
 .hero p {
   max-width: 44ch;
   margin: 0;
-  color: var(--ink-3);
+  color: var(--s-ink-3);
   font-size: 16px;
   line-height: 24px;
   letter-spacing: 0.005em;
@@ -215,26 +307,26 @@ kbd {
   height: 28px;
   padding: 0 12px;
   border-radius: var(--r-pill);
-  background: var(--stage);
-  color: var(--ink-3);
+  background: var(--s-surface);
+  color: var(--s-ink-3);
   font-size: 11px;
   font-weight: 500;
   line-height: 14px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   transition:
-    background-color var(--t-fast) var(--ease),
-    color var(--t-fast) var(--ease);
+    background-color var(--s-dur-fast) var(--s-ease-ui),
+    color var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .chip:hover {
-  background: var(--raised);
-  color: var(--ink);
+  background: var(--s-surface-hover);
+  color: var(--s-ink);
 }
 
 .chip[aria-pressed="true"] {
-  background: var(--ink);
-  color: var(--on-ink);
+  background: var(--s-ink);
+  color: var(--s-cta-ink);
 }
 
 /* masonry: at most 3 columns; each card is as tall as its component needs */
@@ -262,9 +354,9 @@ kbd {
   box-sizing: border-box;
   break-inside: avoid;
   overflow: hidden;
-  border-radius: var(--r-card);
-  background: var(--stage);
-  box-shadow: var(--stage-edge);
+  border-radius: var(--s-r-media);
+  background: var(--s-surface);
+  box-shadow: inset 0 0 0 0.5px var(--s-border);
 }
 
 /* the whole card opens the component; the block itself sits above the
@@ -324,8 +416,8 @@ dialog.modal {
   padding: 16px;
   overflow: auto;
   border: 0;
-  background: var(--bg);
-  color: var(--ink);
+  background: var(--s-bg);
+  color: var(--s-ink);
 }
 
 dialog.modal[open] {
@@ -353,19 +445,31 @@ dialog.modal::backdrop {
   }
 }
 
+.sheet {
+  display: contents; /* a bottom drawer only on small screens */
+}
+
+.sheet-grip {
+  display: none;
+}
+
+.panel {
+  transform-origin: left center;
+}
+
 .stage,
 .panel {
   min-height: 0;
-  border-radius: var(--r-panel);
-  color: var(--ink);
+  border-radius: var(--s-r-panel);
+  color: var(--s-ink);
 }
 
 .stage {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
-  background: var(--stage);
-  box-shadow: var(--stage-edge);
+  background: var(--s-surface);
+  box-shadow: inset 0 0 0 0.5px var(--s-border);
 }
 
 .stage-bar {
@@ -400,8 +504,7 @@ dialog.modal::backdrop {
   scrollbar-width: none;
   padding: 2px;
   border-radius: var(--r-pill);
-  background: var(--raised);
-  box-shadow: inset 0 0 0 0.5px var(--ink-5);
+  background: var(--s-surface-hover);
 }
 
 .seg > * {
@@ -411,25 +514,24 @@ dialog.modal::backdrop {
   height: 28px;
   padding: 0 12px;
   border-radius: var(--r-pill);
-  color: var(--ink-3);
+  color: var(--s-ink-3);
   font-size: 13px;
   font-weight: 400;
   cursor: pointer;
   transition:
-    background-color var(--t-fast) var(--ease),
-    color var(--t-fast) var(--ease),
-    box-shadow var(--t-fast) var(--ease);
+    background-color var(--s-dur-fast) var(--s-ease-ui),
+    color var(--s-dur-fast) var(--s-ease-ui),
+    box-shadow var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .seg > :hover {
-  color: var(--ink);
+  color: var(--s-ink);
 }
 
 .seg > [aria-pressed="true"],
 .seg > :has(:checked) {
-  background: var(--fill-slab);
-  box-shadow: var(--shadow-raised);
-  color: var(--ink);
+  background: var(--s-ink);
+  color: var(--s-cta-ink);
   font-weight: 500;
 }
 
@@ -440,7 +542,7 @@ dialog.modal::backdrop {
 }
 
 .seg > :has(:focus-visible) {
-  outline: 1.5px solid var(--focus);
+  outline: 1.5px solid var(--s-ink-3);
   outline-offset: 2px;
 }
 
@@ -451,13 +553,13 @@ dialog.modal::backdrop {
 }
 
 .pill.solid {
-  background: var(--ink);
-  color: var(--on-ink);
+  background: var(--s-ink);
+  color: var(--s-cta-ink);
 }
 
 .pill.solid:hover {
-  background: var(--ink-2);
-  color: var(--on-ink);
+  background: var(--s-ink-2);
+  color: var(--s-cta-ink);
 }
 
 .pill.outline {
@@ -465,13 +567,13 @@ dialog.modal::backdrop {
   justify-content: center;
   width: 100%;
   height: 36px;
-  background: var(--fill-slab);
-  box-shadow: var(--shadow-raised);
-  color: var(--ink);
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
+  color: var(--s-ink);
 }
 
 .pill.outline:hover {
-  background: var(--stage);
+  background: var(--s-surface);
 }
 
 /* ── settings panel ───────────────────────────────────── */
@@ -481,8 +583,8 @@ dialog.modal::backdrop {
   gap: 8px;
   padding: 20px;
   overflow: auto;
-  background: var(--fill-slab);
-  box-shadow: var(--shadow-raised);
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
 }
 
 .panel header {
@@ -494,53 +596,80 @@ dialog.modal::backdrop {
 
 .panel h2 {
   margin: 0;
-  font-size: 32px;
-  font-weight: 300;
-  line-height: 38px;
-  letter-spacing: -0.01em;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 30px;
+  letter-spacing: -0.02em;
 }
 
 .panel p {
   margin: 0 0 12px;
-  color: var(--ink-3);
-  font-size: 15px;
-  line-height: 22px;
+  color: var(--s-ink-3);
+  font-size: 14px;
+  line-height: 21px;
   letter-spacing: 0.005em;
 }
 
 .panel .icon,
 .stage-bar .icon {
   flex: none;
-  background: var(--raised);
+  background: var(--s-surface-hover);
 }
 
+/* settings controls: no boxes. A subtle label, the value on the right, the control beneath */
 .knob {
   position: relative;
   display: flex;
   flex: none;
-  flex-wrap: wrap; /* a long set of options drops under its label */
   align-items: center;
   justify-content: space-between;
   gap: 8px 12px;
   min-height: 40px;
+  color: var(--s-ink-3);
   font-size: 14px;
   font-weight: 400;
 }
 
-/* a native range, laid invisibly over a row that draws its fill */
+.knob-group {
+  margin: 18px 0 4px;
+  color: var(--s-ink-3);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.knob-group:first-of-type {
+  margin-top: 4px;
+}
+
+.knob output,
+.knob .val {
+  color: var(--s-ink);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.knob output small {
+  margin-left: 2px;
+  color: var(--s-ink-3);
+  font: inherit;
+  font-weight: 400;
+}
+
+/* a slider: a straight line with a dot until the pointer arrives, then it opens into a field of ticks with a bar handle */
 .knob.range {
-  padding: 0 12px;
-  border-radius: var(--r-control);
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--pick) 22%, var(--raised)) var(--p),
-    var(--raised) var(--p)
-  );
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: start;
+  gap: 2px 12px;
+  padding-top: 6px;
 }
 
 .knob.range input {
   position: absolute;
   inset: 0;
+  z-index: 2;
   width: 100%;
   height: 100%;
   margin: 0;
@@ -548,20 +677,191 @@ dialog.modal::backdrop {
   cursor: ew-resize;
 }
 
-.knob.range:has(:focus-visible) {
-  outline: 1.5px solid var(--focus);
+.rail {
+  position: relative;
+  grid-column: 1 / -1;
+  height: 26px; /* fixed, so opening the slider never moves what is below it */
+  margin-top: 10px;
+}
+
+.rail::before,
+.rail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transition: opacity var(--s-dur-med) var(--s-ease-ui);
+}
+
+/* at rest: one thin line */
+.rail::before {
+  top: auto;
+  bottom: 4px; /* everything stands on the bottom edge and grows upward */
+  height: 1px;
+  background: var(--s-border);
+}
+
+/* open: real ticks, so each can have its own height */
+.rail .ticks {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  opacity: 0;
+  transition: opacity var(--s-dur-med) var(--s-ease-ui);
+}
+
+.rail .ticks i {
+  transform-origin: bottom;
+  width: 2px;
+  height: 60%; /* the resting height; a wake of scaleY lifts it while dragging */
+  border-radius: var(--r-pill);
+  background: var(--s-ink-3);
+  opacity: 0.6;
+  transition: height 160ms var(--s-ease-ui), background-color var(--s-dur-fast) var(--s-ease-ui), opacity var(--s-dur-fast) var(--s-ease-ui);
+}
+
+.rail .ticks i[data-on] {
+  background: var(--s-ink);
+  opacity: 1;
+}
+
+.rail .ticks i[data-here] {
+  opacity: 0; /* the handle stands in this tick's place */
+}
+
+.rail .fill {
+  position: absolute;
+  bottom: 3.5px;
+  left: 0;
+  width: var(--p);
+  height: 2px;
+  background: var(--s-ink-3); /* solid at rest; the ticks only appear on hover */
+  transition: opacity var(--s-dur-fast) var(--s-ease-ui);
+}
+
+.rail .thumb {
+  position: absolute;
+  bottom: 0;
+  left: var(--p);
+  width: 9px;
+  height: 9px;
+  translate: -50% 0;
+  border-radius: var(--r-pill);
+  background: var(--s-ink);
+  /* no transition on left: the dot follows the value instantly */
+  transition: width 420ms var(--s-ease-ui), height 420ms var(--s-ease-ui);
+}
+
+.knob.range:hover .rail::before,
+.knob.range:has(:focus-visible) .rail::before,
+.knob.range:has(:active) .rail::before {
+  opacity: 0;
+}
+
+.knob.range:hover .ticks,
+.knob.range:has(:focus-visible) .ticks,
+.knob.range:has(:active) .ticks {
+  opacity: 1;
+}
+
+.knob.range:hover .fill,
+.knob.range:has(:focus-visible) .fill,
+.knob.range:has(:active) .fill {
+  opacity: 0;
+}
+
+.knob.range:hover .thumb,
+.knob.range:has(:focus-visible) .thumb,
+.knob.range:has(:active) .thumb {
+  /* the round dot stretches into a tall pill: the last tick and the handle in one */
+  width: 3px;
+  height: 100%;
+}
+
+/* a choice of a few: outlined buttons, the chosen one bright */
+.knob.choice {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.knob .opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.knob .opts button {
+  height: 34px;
+  padding: 0 14px;
+  border: 0.5px solid var(--s-border);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--s-ink-3);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color var(--s-dur-fast) var(--s-ease-ui), color var(--s-dur-fast) var(--s-ease-ui), scale 420ms var(--s-ease-ui);
+}
+
+.knob .opts button:hover {
+  color: var(--s-ink);
+}
+
+.knob .opts button:active {
+  scale: 0.94;
+}
+
+.knob .opts button[aria-checked="true"] {
+  border-color: var(--s-ink);
+  color: var(--s-ink);
+}
+
+.knob .opts button:focus-visible,
+.knob.select:has(:focus-visible),
+.knob.toggle:has(:focus-visible) {
+  outline: 1.5px solid var(--s-ink-3);
   outline-offset: 2px;
 }
 
-.knob output {
-  color: var(--ink-2);
-  font-variant-numeric: tabular-nums;
+/* a longer choice: the current value with a chevron in an outline; the native select covers it */
+.knob.select {
+  padding: 0 14px;
+  border: 0.5px solid var(--s-border);
+  border-radius: var(--r-pill);
+}
+
+.knob.select .val {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.knob.select .val svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--s-ink-3);
+}
+
+.knob.select select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.knob.toggle {
+  cursor: pointer;
 }
 
 .panel .credit {
   margin: auto 0 4px;
   padding-top: 16px;
-  color: var(--ink-3);
+  color: var(--s-ink-3);
   font-size: 12px;
 }
 
@@ -573,9 +873,9 @@ dialog.modal::backdrop {
 /* ── code view ────────────────────────────────────────── */
 .sec {
   flex: none;
-  border-radius: var(--r-card);
-  background: var(--fill-slab);
-  box-shadow: var(--shadow-raised);
+  border-radius: var(--s-r-media);
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
 }
 
 .sec summary {
@@ -584,7 +884,7 @@ dialog.modal::backdrop {
   gap: 8px;
   height: 44px;
   padding: 0 4px 0 12px;
-  border-radius: var(--r-card);
+  border-radius: var(--s-r-media);
   font-size: 14px;
   font-weight: 500;
   list-style: none;
@@ -598,8 +898,8 @@ dialog.modal::backdrop {
 .sec summary > svg {
   width: 16px;
   height: 16px;
-  color: var(--ink-3);
-  transition: transform var(--t-fast) var(--ease);
+  color: var(--s-ink-3);
+  transition: transform var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .sec[open] summary > svg {
@@ -609,11 +909,11 @@ dialog.modal::backdrop {
 .sec summary .icon {
   margin-left: auto;
   background: none;
-  color: var(--ink-3);
+  color: var(--s-ink-3);
 }
 
 .sec summary .icon:hover {
-  background: var(--raised);
+  background: var(--s-surface-hover);
 }
 
 .sec-body {
@@ -621,13 +921,13 @@ dialog.modal::backdrop {
   padding: 12px 16px;
   overflow: auto;
   border-radius: 2px; /* nested in a 4 px card: outer radius minus inset, at least 2 */
-  background: var(--stage);
+  background: var(--s-surface);
 }
 
 .sec pre {
   margin: 0;
   background: transparent !important;
-  color: var(--ink) !important;
+  color: var(--s-ink) !important;
   font-family: var(--font-code);
   font-size: 13px;
   line-height: 1.6;
@@ -640,7 +940,7 @@ dialog.modal::backdrop {
 
 .sec .none {
   margin: 0;
-  color: var(--ink-3);
+  color: var(--s-ink-3);
   font-size: 14px;
 }
 
@@ -666,8 +966,8 @@ dialog.modal::backdrop {
 
 .sounds .pill {
   height: 28px;
-  background: var(--fill-slab);
-  box-shadow: var(--shadow-raised);
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
   font-family: var(--font-ui);
   font-size: 13px;
 }
@@ -675,12 +975,12 @@ dialog.modal::backdrop {
 .file + .file {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid var(--pane-edge);
+  border-top: 0.5px solid var(--s-border);
 }
 
 .file h3 {
   margin: 0 0 8px;
-  color: var(--ink-3);
+  color: var(--s-ink-3);
   font-size: 11px;
   font-weight: 500;
   line-height: 14px;
@@ -691,7 +991,7 @@ dialog.modal::backdrop {
 .how p {
   max-width: 68ch;
   margin: 0;
-  color: var(--ink-2);
+  color: var(--s-ink-2);
   font-size: 15px;
   line-height: 22px;
   letter-spacing: 0.005em;
@@ -702,7 +1002,7 @@ dialog.modal::backdrop {
 }
 
 .how strong {
-  color: var(--ink);
+  color: var(--s-ink);
   font-weight: 500;
 }
 
@@ -712,10 +1012,10 @@ dialog.modal::backdrop {
   margin-top: 14vh;
   padding: 0;
   border: 0;
-  border-radius: var(--r-panel);
-  background: var(--fill-slab);
-  color: var(--ink);
-  box-shadow: var(--shadow-float);
+  border-radius: var(--s-r-panel);
+  background: var(--s-elevated);
+  color: var(--s-ink);
+  box-shadow: var(--s-shadow-menu);
 }
 
 #menu::backdrop {
@@ -727,7 +1027,7 @@ dialog.modal::backdrop {
   height: 52px;
   padding: 0 16px;
   border: 0;
-  border-bottom: 1px solid var(--pane-edge);
+  border-bottom: 0.5px solid var(--s-border);
   background: none;
   color: inherit;
   font: inherit;
@@ -736,7 +1036,7 @@ dialog.modal::backdrop {
 }
 
 #menu input::placeholder {
-  color: var(--ink-4);
+  color: var(--s-ink-3);
 }
 
 .menu-list {
@@ -752,20 +1052,20 @@ dialog.modal::backdrop {
   justify-content: space-between;
   height: 36px;
   padding: 0 12px;
-  border-radius: var(--r-control);
+  border-radius: var(--s-r-row);
   font-size: 14px;
   font-weight: 400;
-  transition: background-color var(--t-fast) var(--ease);
+  transition: background-color var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .menu-list [data-item]:hover,
 .menu-list [data-item]:focus-visible {
-  background: var(--raised);
+  background: var(--s-surface-hover);
   outline: none;
 }
 
 .menu-list small {
-  color: var(--ink-3);
+  color: var(--s-ink-3);
   font: inherit;
   font-size: 13px;
 }
@@ -773,24 +1073,67 @@ dialog.modal::backdrop {
 .menu-list:not(:has([data-item]:not([hidden])))::after {
   content: "Nothing matches. Try a component name or an interaction like drag.";
   padding: 12px;
-  color: var(--ink-3);
+  color: var(--s-ink-3);
   font-size: 14px;
 }
 
 /* ── small screens ────────────────────────────────────── */
 @media (max-width: 820px) {
+  /* the component opens in a bottom drawer over the dimmed wall */
+  dialog.modal {
+    padding: 0;
+    background: color-mix(in srgb, #000 45%, transparent);
+  }
+
   dialog.modal[open] {
-    place-items: start center;
+    place-items: end center;
+  }
+
+  .sheet {
+    display: block;
+    position: relative;
+    width: 100%;
+    max-height: 92dvh;
+    overflow: auto;
+    overscroll-behavior: contain;
+    border-radius: 16px 16px 0 0;
+    background: var(--s-bg);
+    box-shadow: var(--s-shadow-menu);
+  }
+
+  .sheet-grip {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: block;
+    height: 28px;
+    background: var(--s-bg);
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .sheet-grip::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 36px;
+    height: 4px;
+    translate: -50% 0;
+    border-radius: var(--r-pill);
+    background: var(--s-border);
   }
 
   .detail {
     grid-template-columns: minmax(0, 1fr);
     height: auto;
+    width: 100%;
+    padding: 0 12px 12px;
   }
 
   .stage {
-    height: 68dvh;
-    min-height: 420px;
+    height: 60dvh;
+    min-height: 360px;
   }
 
   .pill kbd {
@@ -802,14 +1145,19 @@ dialog.modal::backdrop {
 @media (max-width: 640px) {
   :root {
     --gutter: 16px;
+    --edge: 0px;
   }
 
-  body::before {
+  .top {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .top .search kbd,
+  .top-end > .pill {
     display: none;
   }
 
-  .top::before,
-  .top::after {
+  body::before {
     display: none;
   }
 
@@ -836,9 +1184,9 @@ dialog.modal::backdrop {
   align-self: flex-end;
   padding: 6px 12px;
   border-radius: var(--r-pill);
-  background: var(--fill-slab);
-  box-shadow: var(--shadow-raised);
-  color: var(--ink-2);
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
+  color: var(--s-ink-2);
   font-size: 13px;
   line-height: 18px;
 }
@@ -855,12 +1203,12 @@ dialog.modal::backdrop {
 .card-tools .icon {
   width: 32px;
   height: 32px;
-  background: var(--fill-slab);
-  box-shadow: var(--shadow-raised);
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
 }
 
 .card-tools .icon:hover {
-  background: var(--raised);
+  background: var(--s-surface-hover);
 }
 
 .card [data-play] .when-playing,
@@ -879,7 +1227,7 @@ dialog.modal::backdrop {
   z-index: 3;
   pointer-events: none;
   opacity: 0;
-  transition: opacity var(--t-base) var(--ease);
+  transition: opacity var(--s-dur-med) var(--s-ease-ui);
 }
 
 .cursor[data-on] {
@@ -890,11 +1238,11 @@ dialog.modal::backdrop {
   display: block;
   width: 22px;
   height: 22px;
-  fill: var(--ink);
-  stroke: var(--bg);
+  fill: var(--s-ink);
+  stroke: var(--s-bg);
   stroke-width: 1.5;
   stroke-linejoin: round;
-  transition: transform 100ms var(--ease);
+  transition: transform 100ms var(--s-ease-ui);
   transform-origin: 5px 3px;
 }
 
@@ -916,10 +1264,10 @@ dialog.modal::backdrop {
   height: 20px;
   margin: 0;
   border-radius: var(--r-pill);
-  background: var(--surface-3);
+  background: var(--s-border-strong);
   appearance: none;
   cursor: pointer;
-  transition: background-color var(--t-fast) var(--ease);
+  transition: background-color var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .switch::after {
@@ -930,13 +1278,13 @@ dialog.modal::backdrop {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--fill-slab);
-  box-shadow: var(--shadow-raised);
-  transition: transform var(--t-fast) var(--ease);
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
+  transition: transform var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .switch:checked {
-  background: var(--pick);
+  background: var(--s-ink);
 }
 
 .switch:checked::after {
@@ -965,14 +1313,14 @@ dialog.modal::backdrop {
 .nav a {
   padding: 8px 12px;
   border-radius: var(--r-pill);
-  color: var(--ink-3);
+  color: var(--s-ink-3);
   font-size: 14px;
-  transition: color var(--t-fast) var(--ease);
+  transition: color var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .nav a:hover,
 .nav a[aria-current] {
-  color: var(--ink);
+  color: var(--s-ink);
 }
 
 /* ── sounds ───────────────────────────────────────────── */
@@ -986,8 +1334,8 @@ dialog.modal::backdrop {
   border: 0;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 30% 26%, hsl(var(--h) 100% 78% / 0.9), transparent 55%),
-    radial-gradient(circle at 70% 78%, hsl(calc(var(--h) + 70) 90% 55%), hsl(var(--h) 85% 58%));
+    radial-gradient(circle at 30% 26%, hsl(0 0% 85% / 0.9), transparent 55%),
+    radial-gradient(circle at 70% 78%, hsl(0 0% 40%), hsl(0 0% 30%));
   cursor: pointer;
 }
 
@@ -1011,7 +1359,7 @@ dialog.modal::backdrop {
 
 .panel .subtitle {
   margin: -6px 0 12px;
-  color: var(--ink-3);
+  color: var(--s-ink-3);
 }
 
 .stat {
@@ -1021,14 +1369,14 @@ dialog.modal::backdrop {
   justify-content: space-between;
   height: 40px;
   padding: 0 12px;
-  border-radius: var(--r-control);
-  background: var(--raised);
-  color: var(--ink-3);
+  border-radius: var(--s-r-row);
+  background: var(--s-surface-hover);
+  color: var(--s-ink-3);
   font-size: 13px;
 }
 
 .stat output {
-  color: var(--ink-2);
+  color: var(--s-ink-2);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1051,13 +1399,11 @@ dialog.modal::backdrop {
 .icon-seg svg {
   width: 18px;
   height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
+  fill: currentColor;
 }
 
 .linklike {
-  color: var(--pick);
+  color: var(--s-ink);
   font: inherit;
   text-decoration: none;
 }
@@ -1085,26 +1431,25 @@ dialog.modal::backdrop {
 
 /* a text knob: label left, a small input right (DESIGN.md input defaults) */
 .knob.text input {
-  flex: 0 1 140px;
+  flex: 0 1 150px;
   min-width: 0;
-  height: 36px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: var(--r-control);
-  background: var(--fill-slab);
-  box-shadow: inset 0 0 0 1px var(--pane-edge);
-  color: var(--ink);
+  height: 32px;
+  padding: 0 14px;
+  border: 0.5px solid var(--s-border);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--s-ink);
   font: inherit;
   font-size: 14px;
 }
 
 .knob.text input:focus-visible {
-  outline: 1.5px solid var(--focus);
+  outline: 1.5px solid var(--s-ink-3);
   outline-offset: 0;
 }
 
 .sounds a.pill {
-  color: var(--ink-2);
+  color: var(--s-ink-2);
 }
 
 /* ── sound library page ───────────────────────────────── */
@@ -1121,9 +1466,9 @@ dialog.modal::backdrop {
 .sfx-pad {
   position: relative;
   height: 260px;
-  border-radius: var(--r-card);
-  background: var(--stage);
-  box-shadow: var(--stage-edge);
+  border-radius: var(--s-r-media);
+  background: var(--s-surface);
+  box-shadow: inset 0 0 0 0.5px var(--s-border);
   overflow: hidden;
 }
 
@@ -1149,7 +1494,7 @@ dialog.modal::backdrop {
   filter: saturate(1.1);
   box-shadow: inset 0 0 18px rgb(255 255 255 / 12%);
   animation: sfx-float 6s ease-in-out infinite alternate;
-  transition: transform var(--t-fast) var(--ease);
+  transition: transform var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .sfx-hit:hover .sfx-orb { transform: scale(1.06); }
@@ -1162,14 +1507,14 @@ dialog.modal::backdrop {
   left: 16px;
   bottom: 16px;
   font-size: 13px;
-  color: var(--ink);
+  color: var(--s-ink);
   pointer-events: none;
   opacity: 0;
   transform: translateY(4px);
-  transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+  transition: opacity var(--s-dur-fast) var(--s-ease-ui), transform var(--s-dur-fast) var(--s-ease-ui);
 }
 
-.sfx-label span { color: var(--ink-3); }
+.sfx-label span { color: var(--s-ink-3); }
 
 .sfx-open {
   position: absolute;
@@ -1177,10 +1522,10 @@ dialog.modal::backdrop {
   bottom: 12px;
   width: 36px;
   height: 36px;
-  background: var(--fill-slab);
-  box-shadow: var(--shadow-raised);
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
   opacity: 0;
-  transition: opacity var(--t-fast) var(--ease);
+  transition: opacity var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .sfx-pad:hover .sfx-label, .sfx-pad:focus-within .sfx-label { opacity: 1; transform: none; }
@@ -1198,59 +1543,59 @@ dialog.modal::backdrop {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--ink);
+  color: var(--s-ink);
   overflow: visible;
 }
 
 .sfx-modal::backdrop { background: rgb(0 0 0 / 55%); }
-.sfx-modal[open] { animation: sfx-in 220ms var(--ease); }
+.sfx-modal[open] { animation: sfx-in 220ms var(--s-ease-ui); }
 @keyframes sfx-in { from { opacity: 0; transform: scale(.98); } }
 
 .sfx-detail { display: grid; grid-template-columns: 1fr 320px; gap: 12px; height: 100%; }
 
 .sfx-stage, .sfx-info {
   position: relative;
-  border-radius: var(--r-panel);
-  background: var(--stage);
-  box-shadow: var(--stage-edge);
+  border-radius: var(--s-r-panel);
+  background: var(--s-surface);
+  box-shadow: inset 0 0 0 0.5px var(--s-border);
 }
 
 .sfx-stage { display: grid; place-items: center; overflow: hidden; }
 .sfx-bar { position: absolute; inset: 12px 12px auto; display: flex; justify-content: space-between; z-index: 2; }
 
-.sfx-seg { display: flex; padding: 3px; border-radius: var(--r-pill); background: var(--raised); }
-.sfx-seg button { display: grid; place-items: center; width: 44px; height: 30px; border-radius: var(--r-pill); color: var(--ink-3); }
-.sfx-seg button[aria-checked="true"] { background: var(--ink); color: var(--on-ink); }
+.sfx-seg { display: flex; padding: 3px; border-radius: var(--r-pill); background: var(--s-surface-hover); }
+.sfx-seg button { display: grid; place-items: center; width: 44px; height: 30px; border-radius: var(--r-pill); color: var(--s-ink-3); }
+.sfx-seg button[aria-checked="true"] { background: var(--s-ink); color: var(--s-cta-ink); }
 .sfx-seg button:disabled { opacity: .35; }
-.sfx-seg svg, .sfx-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sfx-seg svg, .sfx-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
 .sfx-speak { width: 36px; height: 36px; background: none; }
 .sfx-big { position: static; width: 100%; height: 100%; }
 .sfx-big .sfx-orb { width: 240px; height: 240px; }
 .sfx-example { display: grid; place-items: center; }
-.sfx-ex-name { position: absolute; left: 16px; bottom: 16px; font-size: 13px; color: var(--ink-3); }
-.sfx-ex-name:hover { color: var(--ink); }
+.sfx-ex-name { position: absolute; left: 16px; bottom: 16px; font-size: 13px; color: var(--s-ink-3); }
+.sfx-ex-name:hover { color: var(--s-ink); }
 
 .sfx-info { display: flex; flex-direction: column; gap: 16px; padding: 18px; }
 .sfx-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .sfx-head h2 { margin: 0; font-size: 20px; font-weight: 500; line-height: 26px; }
-.sfx-fam { margin: 2px 0 0; font-size: 13px; color: var(--ink-3); }
+.sfx-fam { margin: 2px 0 0; font-size: 13px; color: var(--s-ink-3); }
 .sfx-head .icon { width: 36px; height: 36px; flex: none; }
-.sfx-what { margin: 0; font-size: 13px; line-height: 19px; color: var(--ink-3); }
+.sfx-what { margin: 0; font-size: 13px; line-height: 19px; color: var(--s-ink-3); }
 
 .sfx-rows { display: grid; gap: 6px; margin: 0; }
-.sfx-rows div { display: flex; justify-content: space-between; align-items: center; height: 40px; padding: 0 12px; border-radius: var(--r-control); background: var(--raised); font-size: 13px; }
-.sfx-rows dt { color: var(--ink-3); }
-.sfx-rows dd { margin: 0; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.sfx-rows div { display: flex; justify-content: space-between; align-items: center; height: 40px; padding: 0 12px; border-radius: var(--s-r-row); background: var(--s-surface-hover); font-size: 13px; }
+.sfx-rows dt { color: var(--s-ink-3); }
+.sfx-rows dd { margin: 0; color: var(--s-ink-2); font-variant-numeric: tabular-nums; }
 
 .sfx-acts { display: grid; gap: 8px; margin-top: auto; }
 .sfx-btn {
   display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: var(--r-pill);
-  font-size: 13px; font-weight: 500; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--hairline);
+  font-size: 13px; font-weight: 500; color: var(--s-ink-2); box-shadow: inset 0 0 0 0.5px var(--s-border);
 }
-.sfx-btn:hover { color: var(--ink); background: var(--raised); }
-.sfx-dl { background: var(--ink); color: var(--on-ink); box-shadow: none; }
-.sfx-dl:hover { background: var(--ink); color: var(--on-ink); opacity: .9; }
+.sfx-btn:hover { color: var(--s-ink); background: var(--s-surface-hover); }
+.sfx-dl { background: var(--s-ink); color: var(--s-cta-ink); box-shadow: none; }
+.sfx-dl:hover { background: var(--s-ink); color: var(--s-cta-ink); opacity: .9; }
 
 @media (max-width: 820px) {
   .sfx-modal { height: calc(100dvh - 24px); }
@@ -1268,8 +1613,8 @@ dialog.modal::backdrop {
   opacity: 0;
   transform: translateY(4px);
   transition:
-    opacity var(--t-fast) var(--ease),
-    transform var(--t-fast) var(--ease);
+    opacity var(--s-dur-fast) var(--s-ease-ui),
+    transform var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .card:hover .card-name,
@@ -1292,7 +1637,7 @@ dialog.modal::backdrop {
 
 /* the card's spot while it is lifted into the modal: an empty dashed skeleton */
 .card[data-lifted] {
-  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  background: color-mix(in srgb, var(--s-ink) 3%, transparent);
   box-shadow: none;
 }
 
@@ -1304,7 +1649,7 @@ dialog.modal::backdrop {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1.5px dashed var(--ink-4);
+  border: 1.5px dashed var(--s-ink-3);
   border-radius: inherit;
   pointer-events: none;
   animation: skeleton-in 600ms ease-out 120ms both;
@@ -1319,3 +1664,972 @@ dialog.modal::backdrop {
 /* no visible scrollbars anywhere; scrolling still works */
 * { scrollbar-width: none; }
 *::-webkit-scrollbar { display: none; }
+
+/* ── crisp with a little stretch: springs on press and pop ── */
+.pill,
+.icon,
+.chip,
+.seg > * {
+  transition:
+    background-color var(--s-dur-fast) var(--s-ease-ui),
+    color var(--s-dur-fast) var(--s-ease-ui),
+    box-shadow var(--s-dur-fast) var(--s-ease-ui),
+    scale 420ms var(--s-ease-ui);
+}
+
+.pill:active,
+.icon:active,
+.chip:active,
+.seg > :active {
+  scale: 0.93;
+}
+
+.switch::after {
+  transition: transform 380ms var(--s-ease-ui);
+}
+
+.settings[open] .settings-panel {
+  transform-origin: top right;
+  animation: pop-in 420ms var(--s-ease-ui);
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.9;
+    translate: 0 -6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill:active,
+  .icon:active,
+  .chip:active,
+  .seg > :active {
+    scale: none;
+  }
+
+  .settings[open] .settings-panel {
+    animation: none;
+  }
+
+  .switch::after {
+    transition: none;
+  }
+}
+
+/* while the modal is open the wall behind it holds still, so the open and close stay smooth */
+html:has(dialog.modal[open]) .wall *,
+html:has(dialog.modal[open]) .wall *::before,
+html:has(dialog.modal[open]) .wall *::after {
+  animation-play-state: paused !important;
+}
+
+.knob .switch:not(:checked) {
+  background: var(--s-border);
+}
+
+.knob .switch:not(:checked)::after {
+  background: var(--s-ink-3);
+}
+
+.panel .icon {
+  background: var(--s-surface);
+}
+
+/* a hairline between settings, centred in the space between them */
+.panel > .knob + .knob {
+  margin-top: 12px;
+}
+
+.panel > .knob + .knob::before {
+  content: "";
+  position: absolute;
+  inset: -10px 0 auto;
+  height: 1px;
+  background: var(--s-border);
+  opacity: 0.6;
+}
+
+/* ══ Cosmos controls (2026-11-20) ══════════════════════════
+   Buttons are full pills, icon buttons are circles, surfaces carry a 1px
+   hairline, and motion is quick and plain (no springs on the shell). These
+   come last so they win over the older rules above. */
+
+.pill,
+.icon,
+.chip,
+.seg > *,
+.knob .opts button {
+  transition:
+    background-color var(--s-dur-fast) var(--s-ease-ui),
+    border-color var(--s-dur-fast) var(--s-ease-ui),
+    color var(--s-dur-fast) var(--s-ease-ui),
+    box-shadow var(--s-dur-fast) var(--s-ease-ui),
+    scale var(--s-dur-fast) var(--s-ease-ui);
+}
+
+.pill:active,
+.icon:active,
+.chip:active,
+.seg > :active,
+.knob .opts button:active {
+  scale: 0.97;
+}
+
+/* outlined pill: the default text button (Sounds, Share, Reset). Like cosmos.so:
+   no fill, a 0.5px hairline at 12% ink; hover fills it softly and firms the line */
+.pill,
+.pill.outline {
+  border: 0.5px solid var(--s-border);
+  background: transparent;
+  box-shadow: none;
+  color: var(--s-ink);
+  font-weight: 500;
+}
+
+.pill:hover,
+.pill.outline:hover {
+  border-color: var(--s-border-strong);
+  background: var(--s-outline-hover);
+  color: var(--s-ink);
+}
+
+/* solid pill: the one high-contrast action (Copy prompt, Export JSON) */
+.pill.solid,
+.pill.solid:hover {
+  border-color: var(--s-cta);
+  background: var(--s-cta);
+  color: var(--s-cta-ink);
+}
+
+.pill.solid:hover {
+  border-color: var(--s-cta-hover);
+  background: var(--s-cta-hover);
+}
+
+/* icon buttons are circles, bare until hovered */
+.icon {
+  border-radius: 50%;
+  background: transparent;
+  color: var(--s-ink);
+}
+
+.icon:hover {
+  background: var(--s-surface-hover);
+}
+
+/* icon buttons that sit on a card, the stage or the panel get a surface and a hairline */
+.card-tools .icon,
+.stage-bar .icon,
+.panel .icon {
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
+}
+
+.card-tools .icon:hover,
+.stage-bar .icon:hover,
+.panel .icon:hover {
+  background: var(--s-surface-hover);
+}
+
+/* search: a filled pill with a leading magnifier; its label reads like a placeholder */
+.top .search,
+.top .search:hover {
+  border-color: transparent;
+  background: var(--s-surface);
+}
+
+.top .search {
+  display: flex; /* so the shortcut hint can sit at the far end */
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 0 14px;
+  color: var(--s-ink-3);
+}
+
+.top .search:hover {
+  color: var(--s-ink-2);
+}
+
+.top .search svg {
+  width: 16px;
+  height: 16px;
+}
+
+.top .search kbd {
+  margin-left: auto;
+}
+
+/* filter chips */
+.chip {
+  border: 0.5px solid var(--s-border);
+  background: transparent;
+  color: var(--s-ink-2);
+}
+
+.chip:hover {
+  border-color: var(--s-border-strong);
+  background: var(--s-outline-hover);
+  color: var(--s-ink);
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--s-cta);
+  background: var(--s-cta);
+  color: var(--s-cta-ink);
+}
+
+/* segmented control (Block / Code) */
+.seg {
+  background: var(--s-surface);
+  box-shadow: inset 0 0 0 0.5px var(--s-border);
+}
+
+.seg > [aria-pressed="true"],
+.seg > :has(:checked) {
+  background: var(--s-cta);
+  color: var(--s-cta-ink);
+}
+
+/* menus: the settings dropdown and the Ctrl K search */
+.settings-panel,
+#menu {
+  border: 0.5px solid var(--s-border);
+  border-radius: var(--s-r-menu);
+  background: var(--s-elevated);
+  box-shadow: var(--s-shadow-menu);
+}
+
+.settings-panel {
+  width: 260px;
+  padding: 4px;
+}
+
+.menu-list [data-item] {
+  border-radius: var(--s-r-row);
+}
+
+.menu-list [data-item]:hover,
+.menu-list [data-item]:focus-visible {
+  background: var(--s-surface-hover);
+}
+
+/* a menu row in the Cosmos shape: icon, title, a line of description, shortcut */
+.menu-list .menu-row {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  height: auto;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.menu-row > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--s-ink-2);
+}
+
+.menu-row b {
+  display: block;
+  color: var(--s-ink);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.menu-row small {
+  display: block;
+  color: var(--s-ink-2);
+  font-size: 12px;
+}
+
+.settings[open] .settings-panel {
+  transform-origin: top right;
+  animation: menu-in var(--s-dur-med) var(--s-ease-popover);
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+/* inputs: surface fill, hairline, the strong hairline on focus */
+.knob.text input {
+  border: 0.5px solid var(--s-border);
+  background: var(--s-surface);
+}
+
+.knob.text input:focus-visible {
+  border-color: var(--s-border-strong);
+  outline: none;
+}
+
+.knob.text input::placeholder,
+#menu input::placeholder {
+  color: var(--s-ink-3);
+}
+
+.knob.select,
+.knob .opts button {
+  border: 0.5px solid var(--s-border);
+  background: transparent;
+}
+
+.knob .opts button[aria-checked="true"] {
+  border-color: var(--s-border-strong);
+  background: var(--s-surface-hover);
+  color: var(--s-ink);
+}
+
+/* switch */
+.switch,
+.knob .switch:not(:checked) {
+  background: var(--s-border-strong);
+}
+
+.switch:checked {
+  background: var(--s-ink);
+}
+
+.switch::after,
+.knob .switch:not(:checked)::after {
+  background: var(--s-elevated);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+}
+
+.switch::after {
+  transition: transform var(--s-dur-fast) var(--s-ease-ui);
+}
+
+/* slider */
+.rail .fill {
+  background: var(--s-ink-2);
+}
+
+.rail .thumb {
+  transition:
+    width var(--s-dur-med) var(--s-ease-ui),
+    height var(--s-dur-med) var(--s-ease-ui);
+}
+
+/* wall cards and the modal stage are media: 8px; the settings panel is a panel: 12px */
+.card {
+  border-radius: var(--s-r-media);
+  background: var(--s-card);
+  box-shadow: inset 0 0 0 0.5px var(--s-border);
+}
+
+.stage {
+  border-radius: var(--s-r-media);
+  background: var(--s-card);
+}
+
+.panel {
+  border-radius: var(--s-r-panel);
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
+}
+
+.card-name {
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border);
+  color: var(--s-ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill:active,
+  .icon:active,
+  .chip:active,
+  .seg > :active,
+  .knob .opts button:active {
+    scale: none;
+  }
+
+  .settings[open] .settings-panel {
+    animation: none;
+  }
+}
+
+/* ══ Cosmos, measured in the logged-in app (2026-11-20) ═════
+   Values read from cosmos.so's computed styles: the search bar and its
+   dropdown, the Create and account menus, buttons and the type scale. */
+
+:root,
+[data-theme="light"] {
+  --s-border-soft: rgb(13 13 13 / 0.1); /* buttons use 10%, surfaces 12% */
+  --s-inset: inset 0 1px 1.5px rgb(255 255 255 / 0.7), inset 0 -1px 1.5px rgb(0 0 0 / 0.03);
+}
+
+[data-theme="dark"] {
+  --s-border-soft: rgb(255 255 255 / 0.1);
+  --s-inset: inset 0 1px 1.5px rgb(255 255 255 / 0.055), inset 0 -1px 1.5px rgb(0 0 0 / 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --s-border-soft: rgb(255 255 255 / 0.1);
+    --s-inset: inset 0 1px 1.5px rgb(255 255 255 / 0.055), inset 0 -1px 1.5px rgb(0 0 0 / 0.2);
+  }
+}
+
+:root {
+  --s-shadow-menu: 0 1px 8px rgb(0 0 0 / 0.05); /* menus float on a hairline, not a heavy shadow */
+  --s-ease-popover: cubic-bezier(0, 0, 0.2, 1);
+  --s-dur-menu: 120ms;
+  --s-ease-expand: cubic-bezier(0.22, 1, 0.36, 1); /* the search bar widening on focus, 500ms */
+}
+
+/* ── type: Cosmos's scale, all at −2% tracking (the font itself is unchanged) ── */
+html {
+  letter-spacing: -0.02em;
+}
+
+/* components keep their own tracking */
+.card-block,
+.stage-block,
+.sfx-example {
+  letter-spacing: normal;
+}
+
+.pill,
+.chip,
+.brand {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: -0.01875em;
+}
+
+.chip {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: -0.02em;
+}
+
+.top .search,
+.knob,
+.panel p,
+.menu-list [data-item] {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.panel h2 {
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 30px;
+  letter-spacing: -0.02em;
+}
+
+.panel p {
+  color: var(--s-ink-2);
+}
+
+.knob output small,
+.menu-row small,
+.panel .credit {
+  font-size: 12px;
+  line-height: 14px;
+  color: var(--s-ink-3);
+}
+
+.card-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.hero p {
+  color: var(--s-ink-2);
+}
+
+/* ── buttons: outlined pills sit on a 10% hairline ── */
+.pill,
+.pill.outline,
+.chip {
+  border-color: var(--s-border-soft);
+}
+
+.pill {
+  height: 36px;
+  padding: 0 20px;
+}
+
+/* ── search bar: light-elevation fill, hairline, a soft inset highlight ── */
+.top .search,
+.top .search:hover {
+  border: 0.5px solid var(--s-border);
+  background: var(--s-card);
+  box-shadow: var(--s-inset);
+}
+
+.top .search {
+  justify-self: center;
+  width: 280px;
+  height: 40px;
+}
+
+.top {
+  grid-template-columns: 1fr minmax(0, 440px) 1fr;
+}
+
+/* the Ctrl K search opens as Cosmos's does: the bar widens in place (500ms) and a
+   24px-cornered panel drops in 8px below it (120ms fade and scale) */
+#menu {
+  position: fixed;
+  inset: 12px auto auto 50%;
+  width: min(440px, calc(100vw - 32px));
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  translate: -50% 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#menu::backdrop {
+  background: transparent;
+}
+
+#menu input {
+  height: 40px;
+  padding: 0 18px;
+  border: 0.5px solid var(--s-border);
+  border-radius: var(--r-pill);
+  background: var(--s-card);
+  box-shadow: var(--s-inset);
+  color: var(--s-ink);
+  font-size: 14px;
+  letter-spacing: -0.02em;
+}
+
+#menu[open] input {
+  animation: search-widen 500ms var(--s-ease-expand);
+}
+
+@keyframes search-widen {
+  from {
+    clip-path: inset(0 calc((100% - 280px) / 2) round 9999px);
+  }
+
+  to {
+    clip-path: inset(0 0 round 9999px);
+  }
+}
+
+#menu .menu-list {
+  max-height: min(60vh, 520px);
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 24px;
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border), var(--s-shadow-menu);
+  transform-origin: top center;
+}
+
+#menu[open] .menu-list {
+  animation: menu-in var(--s-dur-menu) var(--s-ease-popover);
+}
+
+#menu .menu-list [data-item] {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 16px;
+  font-weight: 500;
+}
+
+#menu .menu-list small {
+  color: var(--s-ink-3);
+  font-size: 12px;
+}
+
+/* ── menus: 20px container, 4px inset, 16px rows that highlight to the elevation grey ── */
+.settings-panel {
+  width: 240px;
+  padding: 4px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--s-elevated);
+  box-shadow: 0 0 0 0.5px var(--s-border), var(--s-shadow-menu);
+}
+
+.settings[open] .settings-panel {
+  animation: menu-in var(--s-dur-menu) var(--s-ease-popover);
+}
+
+.menu-list [data-item]:hover,
+.menu-list [data-item]:focus-visible {
+  background: var(--s-surface);
+}
+
+.menu-list .menu-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px 0 16px;
+  border-radius: 16px;
+  color: var(--s-ink);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.menu-line > span:first-child {
+  margin-right: auto;
+}
+
+.menu-line > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--s-ink-2);
+}
+
+.menu-line kbd {
+  color: var(--s-ink-3);
+  font-size: 12px;
+}
+
+/* the Theme switch: an elevation pill of 24px circles; the chosen one is inverted */
+.theme-seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--r-pill);
+  background: var(--s-surface);
+}
+
+.theme-seg button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--s-ink-3);
+  transition:
+    background-color var(--s-dur-fast) var(--s-ease-ui),
+    color var(--s-dur-fast) var(--s-ease-ui);
+}
+
+.theme-seg button:hover {
+  color: var(--s-ink);
+}
+
+.theme-seg svg {
+  width: 16px;
+  height: 16px;
+}
+
+:root[data-theme="light"] .theme-seg [data-action="light"],
+:root[data-theme="dark"] .theme-seg [data-action="dark"],
+:root:not([data-theme]) .theme-seg [data-action="system"] {
+  background: var(--s-cta);
+  color: var(--s-cta-ink);
+}
+
+@media (max-width: 640px) {
+  .top .search {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #menu[open] input,
+  #menu[open] .menu-list {
+    animation: none;
+  }
+}
+
+/* the open search keeps the bar's leading magnifier (a mask, so it takes the ink colour) */
+#menu::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  background: var(--s-ink-3);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M229.66 218.34l-50.07-50.06a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.32-11.32ZM40 112a72 72 0 1 1 72 72a72.08 72.08 0 0 1-72-72Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M229.66 218.34l-50.07-50.06a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.32-11.32ZM40 112a72 72 0 1 1 72 72a72.08 72.08 0 0 1-72-72Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  pointer-events: none;
+}
+
+#menu input {
+  padding-left: 40px;
+}
+
+/* the magnifier rides in from where the closed bar's icon sat */
+#menu[open]::before {
+  animation: search-icon 500ms var(--s-ease-expand);
+}
+
+@keyframes search-icon {
+  from {
+    translate: calc((min(440px, 100vw - 32px) - 280px) / 2) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #menu[open]::before {
+    animation: none;
+  }
+}
+
+/* ══ Cosmos light mode, measured (2026-11-20) ═══════════════
+   Light values read with Cosmos switched to light in the account. */
+
+/* header icon buttons are outlined circles, like Cosmos's Activity button */
+.top .icon {
+  border: 0.5px solid var(--s-border-soft);
+}
+
+.top .icon:hover {
+  border-color: var(--s-border-strong);
+  background: var(--s-outline-hover);
+}
+
+/* menu row icons are full ink; only descriptions and shortcuts are faint */
+.menu-line > svg {
+  color: var(--s-ink);
+}
+
+/* opening search dims the page with a 40% ink scrim (150ms) and the panel
+   starts at 98% scale */
+#menu::backdrop {
+  background: rgb(13 13 13 / 0.4);
+  animation: scrim-in 150ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    scale: 0.98;
+  }
+}
+
+/* the open bar drops its inset highlight and its placeholder lifts to secondary */
+#menu input {
+  box-shadow: none;
+}
+
+#menu input::placeholder {
+  color: var(--s-ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #menu::backdrop {
+    animation: none;
+  }
+}
+
+/* wall spacing like Cosmos's grid (about 32px between tiles on desktop); still at most 3 columns */
+.wall {
+  column-gap: 16px;
+}
+
+.card {
+  margin-bottom: 16px;
+}
+
+@media (min-width: 720px) {
+  .wall {
+    column-gap: 24px;
+  }
+
+  .card {
+    margin-bottom: 24px;
+  }
+}
+
+@media (min-width: 1180px) {
+  .wall {
+    column-gap: 32px;
+  }
+
+  .card {
+    margin-bottom: 32px;
+  }
+}
+
+/* the search bar is flat: no inset highlight */
+.top .search,
+.top .search:hover {
+  box-shadow: none;
+}
+
+/* ── tab toggles: the chosen pill slides between options ──
+   Until the script has measured a toggle, the chosen option paints its own
+   background (the rules above); once it has, a ::before pill does, and moves. */
+.seg,
+.theme-seg {
+  position: relative;
+  isolation: isolate;
+}
+
+.seg[data-slide]::before,
+.theme-seg[data-slide]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: var(--seg-w);
+  height: var(--seg-h);
+  translate: var(--seg-x) var(--seg-y);
+  border-radius: var(--r-pill);
+  background: var(--s-cta);
+}
+
+.seg[data-slide="live"]::before,
+.theme-seg[data-slide="live"]::before {
+  transition:
+    translate 320ms var(--s-ease-expand),
+    width 320ms var(--s-ease-expand);
+}
+
+.seg[data-slide] > [aria-pressed="true"],
+.seg[data-slide] > :has(:checked),
+:root[data-theme="light"] .theme-seg[data-slide] [data-action="light"],
+:root[data-theme="dark"] .theme-seg[data-slide] [data-action="dark"],
+:root:not([data-theme]) .theme-seg[data-slide] [data-action="system"] {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seg[data-slide="live"]::before,
+  .theme-seg[data-slide="live"]::before {
+    transition: none;
+  }
+}
+
+/* the logo (the site favicon) sits left of the wordmark */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.brand-logo {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-right: 6px;
+  border-radius: 7px;
+}
+
+/* the mute icon is block-level so the circle centres it */
+[data-muted] .top .when-muted {
+  display: block;
+}
+
+/* ── header nav: the logo, then the pages as plain text links (Cosmos's nav) ── */
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+.top-nav .brand {
+  margin: 0;
+}
+
+.top-nav .brand-logo {
+  margin-right: 4px;
+}
+
+.nav-link {
+  color: var(--s-ink-2);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: -0.01875em;
+  white-space: nowrap;
+  transition: color var(--s-dur-fast) var(--s-ease-ui);
+}
+
+.nav-link:hover,
+.nav-link[data-status="active"] {
+  color: var(--s-ink);
+}
+
+/* ── home: two sections, each a heading with a View all button and six items ── */
+.home-sec {
+  width: 100%;
+  max-width: var(--column);
+  margin-inline: auto;
+  padding: 0 var(--gutter) 48px;
+}
+
+.home-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.home-head h2 {
+  margin: 0;
+  color: var(--s-ink);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 30px;
+  letter-spacing: -0.02em;
+}
+
+/* inside a home section the grids already sit in the column */
+.home-sec .wall,
+.home-sec .sfx-grid {
+  max-width: none;
+  padding-inline: 0;
+  padding-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .top-nav {
+    gap: 14px;
+  }
+
+  .nav-link {
+    font-size: 14px;
+  }
+}
+
+/* six sounds on home read as two rows of three, spaced like the wall */
+@media (min-width: 720px) {
+  .home-sec .sfx-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+@media (min-width: 1180px) {
+  .home-sec .sfx-grid {
+    gap: 32px;
+  }
+}
+
+/* sound tiles match the component cards */
+.sfx-pad {
+  border-radius: var(--s-r-media);
+  background: var(--s-card);
+  box-shadow: inset 0 0 0 0.5px var(--s-border);
+}

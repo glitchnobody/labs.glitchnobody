@@ -10,18 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WallRouteImport } from './routes/_wall'
-import { Route as SoundsRouteImport } from './routes/sounds'
 import { Route as WallIndexRouteImport } from './routes/_wall/index'
 import { Route as WallSlugRouteImport } from './routes/_wall/$slug'
+import { Route as WallComponentsRouteImport } from './routes/_wall/components'
+import { Route as WallSoundsRouteImport } from './routes/_wall/sounds'
+import { Route as InsiderToolsInternalComponentLibraryRouteImport } from './routes/insider-tools.internal-component-library'
+import { Route as WallComponentsSlugRouteImport } from './routes/_wall/components.$slug'
+import { Route as WallSoundsNameRouteImport } from './routes/_wall/sounds.$name'
 import { Route as ApiCodeSlugRouteImport } from './routes/api/code/$slug'
 
 const WallRoute = WallRouteImport.update({
   id: '/_wall',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SoundsRoute = SoundsRouteImport.update({
-  id: '/sounds',
-  path: '/sounds',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WallIndexRoute = WallIndexRouteImport.update({
@@ -34,6 +33,32 @@ const WallSlugRoute = WallSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => WallRoute,
 } as any)
+const WallComponentsRoute = WallComponentsRouteImport.update({
+  id: '/components',
+  path: '/components',
+  getParentRoute: () => WallRoute,
+} as any)
+const WallSoundsRoute = WallSoundsRouteImport.update({
+  id: '/sounds',
+  path: '/sounds',
+  getParentRoute: () => WallRoute,
+} as any)
+const InsiderToolsInternalComponentLibraryRoute =
+  InsiderToolsInternalComponentLibraryRouteImport.update({
+    id: '/insider-tools/internal-component-library',
+    path: '/insider-tools/internal-component-library',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const WallComponentsSlugRoute = WallComponentsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => WallComponentsRoute,
+} as any)
+const WallSoundsNameRoute = WallSoundsNameRouteImport.update({
+  id: '/$name',
+  path: '/$name',
+  getParentRoute: () => WallSoundsRoute,
+} as any)
 const ApiCodeSlugRoute = ApiCodeSlugRouteImport.update({
   id: '/api/code/$slug',
   path: '/api/code/$slug',
@@ -42,41 +67,73 @@ const ApiCodeSlugRoute = ApiCodeSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof WallIndexRoute
-  '/sounds': typeof SoundsRoute
   '/$slug': typeof WallSlugRoute
+  '/components': typeof WallComponentsRouteWithChildren
+  '/sounds': typeof WallSoundsRouteWithChildren
+  '/insider-tools/internal-component-library': typeof InsiderToolsInternalComponentLibraryRoute
+  '/components/$slug': typeof WallComponentsSlugRoute
+  '/sounds/$name': typeof WallSoundsNameRoute
   '/api/code/$slug': typeof ApiCodeSlugRoute
 }
 export interface FileRoutesByTo {
-  '/sounds': typeof SoundsRoute
   '/$slug': typeof WallSlugRoute
+  '/components': typeof WallComponentsRouteWithChildren
+  '/sounds': typeof WallSoundsRouteWithChildren
+  '/insider-tools/internal-component-library': typeof InsiderToolsInternalComponentLibraryRoute
   '/': typeof WallIndexRoute
+  '/components/$slug': typeof WallComponentsSlugRoute
+  '/sounds/$name': typeof WallSoundsNameRoute
   '/api/code/$slug': typeof ApiCodeSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_wall': typeof WallRouteWithChildren
-  '/sounds': typeof SoundsRoute
   '/_wall/$slug': typeof WallSlugRoute
+  '/_wall/components': typeof WallComponentsRouteWithChildren
+  '/_wall/sounds': typeof WallSoundsRouteWithChildren
+  '/insider-tools/internal-component-library': typeof InsiderToolsInternalComponentLibraryRoute
   '/_wall/': typeof WallIndexRoute
+  '/_wall/components/$slug': typeof WallComponentsSlugRoute
+  '/_wall/sounds/$name': typeof WallSoundsNameRoute
   '/api/code/$slug': typeof ApiCodeSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sounds' | '/$slug' | '/api/code/$slug'
+  fullPaths:
+    | '/'
+    | '/$slug'
+    | '/components'
+    | '/sounds'
+    | '/insider-tools/internal-component-library'
+    | '/components/$slug'
+    | '/sounds/$name'
+    | '/api/code/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sounds' | '/$slug' | '/' | '/api/code/$slug'
+  to:
+    | '/$slug'
+    | '/components'
+    | '/sounds'
+    | '/insider-tools/internal-component-library'
+    | '/'
+    | '/components/$slug'
+    | '/sounds/$name'
+    | '/api/code/$slug'
   id:
     | '__root__'
     | '/_wall'
-    | '/sounds'
     | '/_wall/$slug'
+    | '/_wall/components'
+    | '/_wall/sounds'
+    | '/insider-tools/internal-component-library'
     | '/_wall/'
+    | '/_wall/components/$slug'
+    | '/_wall/sounds/$name'
     | '/api/code/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   WallRoute: typeof WallRouteWithChildren
-  SoundsRoute: typeof SoundsRoute
+  InsiderToolsInternalComponentLibraryRoute: typeof InsiderToolsInternalComponentLibraryRoute
   ApiCodeSlugRoute: typeof ApiCodeSlugRoute
 }
 
@@ -87,13 +144,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof WallRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sounds': {
-      id: '/sounds'
-      path: '/sounds'
-      fullPath: '/sounds'
-      preLoaderRoute: typeof SoundsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_wall/': {
@@ -110,6 +160,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WallSlugRouteImport
       parentRoute: typeof WallRoute
     }
+    '/_wall/components': {
+      id: '/_wall/components'
+      path: '/components'
+      fullPath: '/components'
+      preLoaderRoute: typeof WallComponentsRouteImport
+      parentRoute: typeof WallRoute
+    }
+    '/_wall/sounds': {
+      id: '/_wall/sounds'
+      path: '/sounds'
+      fullPath: '/sounds'
+      preLoaderRoute: typeof WallSoundsRouteImport
+      parentRoute: typeof WallRoute
+    }
+    '/insider-tools/internal-component-library': {
+      id: '/insider-tools/internal-component-library'
+      path: '/insider-tools/internal-component-library'
+      fullPath: '/insider-tools/internal-component-library'
+      preLoaderRoute: typeof InsiderToolsInternalComponentLibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_wall/components/$slug': {
+      id: '/_wall/components/$slug'
+      path: '/$slug'
+      fullPath: '/components/$slug'
+      preLoaderRoute: typeof WallComponentsSlugRouteImport
+      parentRoute: typeof WallComponentsRoute
+    }
+    '/_wall/sounds/$name': {
+      id: '/_wall/sounds/$name'
+      path: '/$name'
+      fullPath: '/sounds/$name'
+      preLoaderRoute: typeof WallSoundsNameRouteImport
+      parentRoute: typeof WallSoundsRoute
+    }
     '/api/code/$slug': {
       id: '/api/code/$slug'
       path: '/api/code/$slug'
@@ -120,13 +205,41 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface WallComponentsRouteChildren {
+  WallComponentsSlugRoute: typeof WallComponentsSlugRoute
+}
+
+const WallComponentsRouteChildren: WallComponentsRouteChildren = {
+  WallComponentsSlugRoute: WallComponentsSlugRoute,
+}
+
+const WallComponentsRouteWithChildren = WallComponentsRoute._addFileChildren(
+  WallComponentsRouteChildren,
+)
+
+interface WallSoundsRouteChildren {
+  WallSoundsNameRoute: typeof WallSoundsNameRoute
+}
+
+const WallSoundsRouteChildren: WallSoundsRouteChildren = {
+  WallSoundsNameRoute: WallSoundsNameRoute,
+}
+
+const WallSoundsRouteWithChildren = WallSoundsRoute._addFileChildren(
+  WallSoundsRouteChildren,
+)
+
 interface WallRouteChildren {
   WallSlugRoute: typeof WallSlugRoute
+  WallComponentsRoute: typeof WallComponentsRouteWithChildren
+  WallSoundsRoute: typeof WallSoundsRouteWithChildren
   WallIndexRoute: typeof WallIndexRoute
 }
 
 const WallRouteChildren: WallRouteChildren = {
   WallSlugRoute: WallSlugRoute,
+  WallComponentsRoute: WallComponentsRouteWithChildren,
+  WallSoundsRoute: WallSoundsRouteWithChildren,
   WallIndexRoute: WallIndexRoute,
 }
 
@@ -134,7 +247,8 @@ const WallRouteWithChildren = WallRoute._addFileChildren(WallRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   WallRoute: WallRouteWithChildren,
-  SoundsRoute: SoundsRoute,
+  InsiderToolsInternalComponentLibraryRoute:
+    InsiderToolsInternalComponentLibraryRoute,
   ApiCodeSlugRoute: ApiCodeSlugRoute,
 }
 export const routeTree = rootRouteImport

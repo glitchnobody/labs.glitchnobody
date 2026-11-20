@@ -1,4 +1,5 @@
-import { useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Icon } from "@iconify/react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { blocks, type Knob } from "../lab";
 import { play } from "../lab/sound";
@@ -6,14 +7,8 @@ import Block from "./Block";
 
 type Code = { files: { name: string; html: string }[]; how: { title: string; text: string }[] };
 
-const Icon = ({ d }: { d: string }) => (
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d={d} />
-  </svg>
-);
-
-const COPY = "M9 9h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1ZM5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1";
-const CHECK = "m5 12.5 4.5 4.5L19 7.5";
+const COPY = "ph:copy";
+const CHECK = "ph:check";
 
 /* the player handed out with "Copy prompt", so the copied component can make its sounds */
 const PLAYER = `// sound.ts: plays /sounds/<name>.mp3 through Web Audio, decoded once and cached
@@ -69,7 +64,7 @@ function Copy({ text, label, className = "icon", icon }: { text: () => string; l
         setTimeout(() => setState(""), 1500);
       }}
     >
-      {className === "icon" ? <Icon d={state === "Copied" ? CHECK : COPY} /> : <>{icon && <Icon d={icon} />}{state || label}</>}
+      {className === "icon" ? <Icon icon={state === "Copied" ? CHECK : COPY} /> : <>{icon && <Icon icon={icon} />}{state || label}</>}
     </button>
   );
 }
@@ -79,7 +74,7 @@ function Section({ title, open, copy = true, text, children }: { title: string; 
   return (
     <details className="sec" open={open}>
       <summary>
-        <Icon d="m9 6 6 6-6 6" />
+        <Icon icon="ph:caret-right" />
         {title}
         {copy && <Copy label={`Copy ${title.toLowerCase()}`} text={text ?? (() => body.current!.innerText)} />}
       </summary>
@@ -90,24 +85,109 @@ function Section({ title, open, copy = true, text, children }: { title: string; 
   );
 }
 
-/* a row of options; every knob that is not a range is one of these */
-function Seg<T>({ label, value, options, onChange }: { label: string; value: T; options: [string, T][]; onChange: (v: T) => void }) {
+const TICKS = 47; // at most one every 6px across the 280px panel
+const CHEVRON = "ph:caret-down";
+
+/* "Size (px)" -> the label "Size" and the unit "px", so the value reads "40px" like a design tool */
+const unitOf = (label: string) => {
+  const m = label.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+  return m ? { name: m[1], unit: m[2] } : { name: label, unit: "" };
+};
+
+/* a row with a label and a switch: every on/off setting */
+function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div className="knob" role="radiogroup" aria-label={label}>
+    <label className="knob toggle">
       <span>{label}</span>
-      <div className="seg">
-        {options.map(([name, v]) => (
-          <label key={name}>
-            <input type="radio" name={label} checked={value === v} onChange={() => onChange(v)} />
-            {name}
-          </label>
-        ))}
-      </div>
-    </div>
+      <input type="checkbox" className="switch" checked={on} onChange={(e) => onChange(e.target.checked)} />
+    </label>
   );
 }
 
 /* one component, opened: the live block, its knobs, and its code */
+/* a slider: a line with a dot until the pointer arrives, then a row of ticks (one per allowed value) with a tall handle.
+   Dragging leaves a wake: every tick the handle passes jumps up by how fast it was dragged, then settles back
+   (an exponential fall, like the wake slider), so quick drags leave a taller wave than slow ones. */
+function Range({ k, value, onChange }: { k: Extract<Knob, { type: "range" }>; value: number; onChange: (n: number) => void }) {
+  const { name, unit } = unitOf(k.label);
+  const ticks = Math.max(2, Math.min(TICKS, Math.round((k.max - k.min) / (k.step ?? 1)) + 1));
+  const at = (v: number) => Math.round(((v - k.min) / (k.max - k.min)) * (ticks - 1));
+  const here = at(value);
+  const els = useRef<(HTMLElement | null)[]>([]);
+  const w = useRef({ energy: new Float32Array(ticks), raf: 0, last: here, t: 0, speed: 0 });
+
+  /* a new tick count is a new row */
+  useEffect(() => {
+    w.current.energy = new Float32Array(ticks);
+  }, [ticks]);
+  useEffect(() => () => cancelAnimationFrame(w.current.raf), []);
+
+  const loop = () => {
+    const s = w.current;
+    if (s.raf) return;
+    let prev = performance.now();
+    const run = (now: number) => {
+      const dt = Math.min(0.05, (now - prev) / 1000);
+      prev = now;
+      const fall = Math.exp(-dt * 6.5);
+      let live = false;
+      for (let i = 0; i < s.energy.length; i++) {
+        s.energy[i] *= fall;
+        if (s.energy[i] < 0.002) s.energy[i] = 0;
+        else live = true;
+        const el = els.current[i];
+        if (el) el.style.transform = s.energy[i] ? `scaleY(${(1 + s.energy[i] * (1 / 0.6 - 1)).toFixed(3)})` : "";
+      }
+      s.raf = live ? requestAnimationFrame(run) : 0;
+    };
+    s.raf = requestAnimationFrame(run);
+  };
+
+  const change = (n: number) => {
+    const s = w.current;
+    const b = at(n);
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches && b !== s.last) {
+      const now = performance.now();
+      const dt = Math.max(0.008, (now - s.t) / 1000);
+      s.t = now;
+      /* speed in px per second (ticks sit about 6px apart), smoothed so one jittery frame cannot fake a fling */
+      s.speed = s.speed * 0.5 + ((Math.abs(b - s.last) * 6) / dt) * 0.5;
+      const push = Math.min(1, 0.4 + s.speed / 500); // a gentle drag lifts the wake 40% of the way, an ordinary one reaches the full slider height
+      for (let i = Math.min(b, s.last); i <= Math.max(b, s.last); i++) s.energy[i] = Math.max(s.energy[i], push);
+      loop();
+    }
+    s.last = b;
+    onChange(n);
+  };
+
+  return (
+    <label className="knob range" style={{ "--p": `${((value - k.min) / (k.max - k.min)) * 100}%` } as CSSProperties}>
+      <span>{name}</span>
+      <output>
+        {value}
+        {unit && <small>{unit}</small>}
+      </output>
+      <span className="rail" aria-hidden="true">
+        <span className="ticks">
+          {Array.from({ length: ticks }, (_, i) => (
+            <i
+              key={i}
+              ref={(el) => {
+                els.current[i] = el;
+              }}
+              data-on={i <= here || undefined}
+              data-here={i === here || undefined}
+            />
+          ))}
+        </span>
+        <i className="fill" />
+        <i className="thumb" />
+      </span>
+      <input type="range" min={k.min} max={k.max} step={k.step ?? 1} value={value} onChange={(e) => change(Number(e.target.value))} />
+    </label>
+  );
+}
+
 export default function Detail({ slug, onClose }: { slug: string; onClose: () => void }) {
   const meta = blocks[slug];
   const [props, setProps] = useState<Record<string, any>>(() =>
@@ -119,7 +199,6 @@ export default function Detail({ slug, onClose }: { slug: string; onClose: () =>
   const [fill, setFill] = useState(
     () => document.documentElement.dataset.theme ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"),
   );
-  const [stroke, setStroke] = useState("off");
   /* the code view (highlighted files and how-it-works notes) comes from the server
      route /api/code/$slug, cached by TanStack Query so reopening a component is instant */
   const { data, isError } = useQuery({
@@ -159,25 +238,7 @@ export default function Detail({ slug, onClose }: { slug: string; onClose: () =>
 
   const knob = (k: Knob) => {
     const value = props[k.prop];
-    if (k.type === "range")
-      return (
-        <label
-          key={k.prop}
-          className="knob range"
-          style={{ "--p": `${((value - k.min) / (k.max - k.min)) * 100}%` } as CSSProperties}
-        >
-          <span>{k.label}</span>
-          <output>{value}</output>
-          <input
-            type="range"
-            min={k.min}
-            max={k.max}
-            step={k.step ?? 1}
-            value={value}
-            onChange={(e) => set(k.prop, Number(e.target.value))}
-          />
-        </label>
-      );
+    if (k.type === "range") return <Range key={k.prop} k={k} value={value} onChange={(n) => set(k.prop, n)} />;
     if (k.type === "text")
       return (
         <label key={k.prop} className="knob text">
@@ -192,14 +253,40 @@ export default function Detail({ slug, onClose }: { slug: string; onClose: () =>
           />
         </label>
       );
-    const options: [string, unknown][] =
-      k.type === "select" ? k.options.map((o) => [o, o]) : [["Off", false], ["On", true]];
-    return <Seg key={k.prop} label={k.label} value={value} options={options} onChange={(v) => set(k.prop, v)} />;
+    if (k.type === "select" && k.options.length <= 4)
+      return (
+        <div key={k.prop} className="knob choice" role="radiogroup" aria-label={k.label}>
+          <span>{k.label}</span>
+          <div className="opts">
+            {k.options.map((o) => (
+              <button key={o} type="button" role="radio" aria-checked={value === o} onClick={() => set(k.prop, o)}>
+                {o}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    if (k.type === "select")
+      return (
+        <label key={k.prop} className="knob select">
+          <span>{k.label}</span>
+          <span className="val">
+            {value}
+            <Icon icon={CHEVRON} />
+          </span>
+          <select value={value} onChange={(e) => set(k.prop, e.target.value)} aria-label={k.label}>
+            {k.options.map((o) => (
+              <option key={o}>{o}</option>
+            ))}
+          </select>
+        </label>
+      );
+    return <Toggle key={k.prop} label={k.label} on={!!value} onChange={(v) => set(k.prop, v)} />;
   };
 
   return (
     <div className="detail">
-      <section className="stage" data-shortcut-scope data-theme={fill} data-fill={fill} data-stroke={stroke} aria-label={`${meta.name} preview`}>
+      <section className="stage" data-shortcut-scope data-theme={fill} data-fill={fill} aria-label={`${meta.name} preview`}>
         <div className="stage-bar">
           <div className="seg" role="group" aria-label="View">
             <button type="button" aria-pressed={view === "block"} onClick={() => setView("block")}>
@@ -209,11 +296,21 @@ export default function Detail({ slug, onClose }: { slug: string; onClose: () =>
               Code
             </button>
           </div>
-          {view === "code" && (
-            <div className="bar-actions">
+          <div className="bar-actions">
+            {view === "code" ? (
               <Copy className="pill solid" label="Copy prompt" text={prompt} />
-            </div>
-          )}
+            ) : (
+              <button
+                type="button"
+                className="icon"
+                aria-label={fill === "dark" ? "Preview in light mode" : "Preview in dark mode"}
+                title={fill === "dark" ? "Light mode" : "Dark mode"}
+                onClick={() => setFill(fill === "dark" ? "light" : "dark")}
+              >
+                <Icon icon={fill === "dark" ? "ph:sun" : "ph:moon"} />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="stage-block" hidden={view !== "block"}>
@@ -273,19 +370,17 @@ export default function Detail({ slug, onClose }: { slug: string; onClose: () =>
         <header>
           <h2>{meta.name}</h2>
           <button type="button" className="icon" onClick={onClose} aria-label="Close">
-            <Icon d="m7 7 10 10M17 7 7 17" />
+            <Icon icon="ph:x" />
           </button>
         </header>
         <p>{meta.description}</p>
-        <Seg label="Dark mode" value={fill} options={[["Off", "light"], ["On", "dark"]]} onChange={setFill} />
-        <Seg label="Stroke" value={stroke} options={[["Off", "off"], ["On", "on"]]} onChange={setStroke} />
         {meta.knobs.map(knob)}
         {meta.adaptedFrom && (
           <p className="credit">
             Adapted from <a href={meta.adaptedFrom}>this source</a>; see THIRD_PARTY.md.
           </p>
         )}
-        <Copy className="pill outline" label="Share" icon="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 0 1 0 10h-2m-7-5h8" text={() => location.href} />
+        <Copy className="pill outline" label="Share" icon="ph:link" text={() => location.href} />
       </aside>
     </div>
   );

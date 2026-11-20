@@ -4,7 +4,7 @@ import "./InputBox.site.css";
 
 export default {
   name: "Input box",
-  description: "A username field with a floating label and live checks. Focus it and the border draws itself; type and the rules tick off while a ring counts your characters. Try jonas or mira for a taken name.",
+  description: "A username field with a floating label and live checks. Focus it and the border draws itself; type and the rules tick off. Try jonas or mira for a taken name.",
   tag: "Type",
   install: "npm install @iconify/react",
   sounds: ["tick", "pop", "error", "swipe"],

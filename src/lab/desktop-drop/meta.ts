@@ -4,7 +4,7 @@ import "./DesktopDrop.site.css";
 
 export default {
   name: "Desktop drop",
-  description: "A tiny desktop with a folder and a few files. Drag any file and they all stack under the pointer; drop them on the folder to see their tags pop up. Double-click the folder to pour them out.",
+  description: "A tiny desktop with a folder and a few files. Drag one and they all stack under the pointer; drop them on the folder to tag them, double-click it to pour them out.",
   tag: "Drag",
   install: "npm install @iconify/react",
   sounds: ["tick", "slide", "pop"],

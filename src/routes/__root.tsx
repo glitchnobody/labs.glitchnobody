@@ -1,3 +1,4 @@
+import { Icon } from "@iconify/react";
 import type { QueryClient } from "@tanstack/react-query";
 import {
 	createRootRouteWithContext,
@@ -57,44 +58,55 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<header className="top">
-					<Link className="brand" to="/">
-						glitchnobody <span>labs</span>
-					</Link>
-					<Link className="pill" to="/sounds">
-						Sounds
-					</Link>
-					<button type="button" className="pill" data-action="menu">
+					<nav className="top-nav" aria-label="Pages">
+						<Link className="brand" to="/" aria-label="glitchnobody labs, home">
+							<img className="brand-logo" src="/favicon.svg" alt="" width={24} height={24} />
+						</Link>
+						<Link className="nav-link" to="/components">
+							Components
+						</Link>
+						<Link className="nav-link" to="/sounds">
+							Sounds
+						</Link>
+					</nav>
+					<button type="button" className="pill search" data-action="menu">
+						<Icon icon="ph:magnifying-glass" />
 						Search <kbd>Ctrl K</kbd>
 					</button>
-					<button
-						type="button"
-						className="icon"
-						data-action="theme"
-						aria-label="Switch between light and dark"
-						title="Alt D"
-					>
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<circle cx="12" cy="12" r="8" />
-							<path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" />
-						</svg>
-					</button>
-					<button
-						type="button"
-						className="icon"
-						data-action="mute"
-						aria-label="Mute sounds"
-						aria-pressed="false"
-						title="Alt M"
-					>
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4Z" />
-							<path
-								className="when-sound"
-								d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"
-							/>
-							<path className="when-muted" d="m16 9.5 5 5m0-5-5 5" />
-						</svg>
-					</button>
+					<div className="top-end">
+						<button
+							type="button"
+							className="icon"
+							data-action="mute"
+							aria-label="Mute sounds"
+							aria-pressed="false"
+							title="Mute sounds (Alt M)"
+						>
+							<Icon icon="ph:speaker-high" className="when-sound" />
+							<Icon icon="ph:speaker-slash" className="when-muted" />
+						</button>
+						<details className="settings">
+							<summary className="icon" aria-label="Settings" title="Settings">
+								<Icon icon="ph:gear" />
+							</summary>
+							<div className="settings-panel menu-list">
+								<div className="menu-line">
+									<span>Theme</span>
+									<span className="theme-seg" role="group" aria-label="Theme">
+										<button type="button" data-action="light" aria-label="Light" title="Light">
+											<Icon icon="ph:sun" />
+										</button>
+										<button type="button" data-action="dark" aria-label="Dark" title="Dark">
+											<Icon icon="ph:moon" />
+										</button>
+										<button type="button" data-action="system" aria-label="System" title="System">
+											<Icon icon="ph:circle-half" />
+										</button>
+									</span>
+								</div>
+							</div>
+						</details>
+					</div>
 				</header>
 
 				{children}
@@ -127,7 +139,7 @@ function Menu() {
 			for (const b of document.querySelectorAll('.top [data-action="mute"]'))
 				b.setAttribute("aria-pressed", String(on));
 			for (const b of document.querySelectorAll(
-				'#menu [data-action="mute"] span',
+				'[data-action="mute"] [data-label]',
 			))
 				b.textContent = on ? "Unmute sounds" : "Mute sounds";
 		};
@@ -139,6 +151,25 @@ function Menu() {
 				root.dataset.theme = dark ? "light" : "dark";
 				try {
 					localStorage.setItem("theme", root.dataset.theme);
+				} catch {}
+			},
+			/* the Theme switch in the Settings menu sets a side directly; "system" follows the OS */
+			light() {
+				root.dataset.theme = "light";
+				try {
+					localStorage.setItem("theme", "light");
+				} catch {}
+			},
+			dark() {
+				root.dataset.theme = "dark";
+				try {
+					localStorage.setItem("theme", "dark");
+				} catch {}
+			},
+			system() {
+				delete root.dataset.theme;
+				try {
+					localStorage.removeItem("theme");
 				} catch {}
 			},
 			mute() {
@@ -160,11 +191,13 @@ function Menu() {
 		const onClose = () => play("collapse", { volume: 0.25 });
 		const onClick = (e: MouseEvent) => {
 			const target = e.target as Element;
+			for (const d of document.querySelectorAll<HTMLDetailsElement>("details.settings[open]"))
+				if (!d.contains(target)) d.open = false;
 			const link = target.closest<HTMLAnchorElement>("a[data-block]");
 			if (link && !e.button && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
 				e.preventDefault(); // new-tab clicks go through as plain links
 				router.navigate({
-					to: "/$slug",
+					to: "/components/$slug",
 					params: { slug: link.dataset.block! },
 					resetScroll: false,
 				});
@@ -207,6 +240,8 @@ function Menu() {
 				play(el.open ? "expand" : "collapse", { volume: 0.25 });
 		};
 		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape")
+				for (const d of document.querySelectorAll<HTMLDetailsElement>("details.settings[open]")) d.open = false;
 			const mod = e.metaKey || e.ctrlKey;
 			if (mod && e.key.toLowerCase() === "k") {
 				e.preventDefault();
@@ -237,6 +272,42 @@ function Menu() {
 			}
 		};
 
+		/* tab toggles (Block/Code, the Theme switch, the library tabs) get a pill that
+		   slides to the chosen option: each toggle carries the chosen option's box as
+		   --seg-x/y/w/h, and CSS draws and animates the pill from those */
+		const chosen = (seg: Element) =>
+			seg.classList.contains("theme-seg")
+				? seg.querySelector(`[data-action="${root.dataset.theme ?? "system"}"]`)
+				: seg.querySelector(':scope > [aria-pressed="true"], :scope > :has(:checked)');
+		const syncSegs = () => {
+			for (const seg of document.querySelectorAll<HTMLElement>(".seg, .theme-seg")) {
+				const on = chosen(seg) as HTMLElement | null;
+				if (!on || !on.offsetWidth) continue;
+				seg.style.setProperty("--seg-x", `${on.offsetLeft}px`);
+				seg.style.setProperty("--seg-y", `${on.offsetTop}px`);
+				seg.style.setProperty("--seg-w", `${on.offsetWidth}px`);
+				seg.style.setProperty("--seg-h", `${on.offsetHeight}px`);
+				/* the first placement is instant; moves after that slide */
+				if (!seg.dataset.slide) {
+					seg.dataset.slide = "set";
+					requestAnimationFrame(() => requestAnimationFrame(() => (seg.dataset.slide = "live")));
+				}
+			}
+		};
+		const soon = () => {
+			requestAnimationFrame(syncSegs);
+			setTimeout(syncSegs, 60); // after a route change has rendered
+		};
+		const segWatch = new MutationObserver(soon);
+		segWatch.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+		const modal = document.querySelector("dialog.modal");
+		if (modal) segWatch.observe(modal, { childList: true });
+		document.addEventListener("click", soon);
+		document.addEventListener("change", soon);
+		document.addEventListener("toggle", soon, true);
+		window.addEventListener("resize", soon);
+		soon();
+
 		showMute();
 		menu.addEventListener("close", onClose);
 		input.addEventListener("input", filter);
@@ -260,6 +331,11 @@ function Menu() {
 			document.removeEventListener("input", onInput);
 			document.removeEventListener("toggle", onToggle, true);
 			document.removeEventListener("keydown", onKey);
+			document.removeEventListener("click", soon);
+			document.removeEventListener("change", soon);
+			document.removeEventListener("toggle", soon, true);
+			window.removeEventListener("resize", soon);
+			segWatch.disconnect();
 		};
 	}, [router]);
 
@@ -275,7 +351,7 @@ function Menu() {
 				{Object.entries(blocks).map(([slug, m]) => (
 					<a
 						key={slug}
-						href={`/${slug}`}
+						href={`/components/${slug}`}
 						data-block={slug}
 						data-item={`${m.name} ${m.tag} ${m.description}`.toLowerCase()}
 					>
@@ -304,7 +380,7 @@ function Menu() {
 					data-action="mute"
 					data-item="mute sounds unmute audio volume"
 				>
-					<span>Mute sounds</span> <kbd>Alt M</kbd>
+					<span data-label>Mute sounds</span> <kbd>Alt M</kbd>
 				</button>
 			</div>
 		</dialog>

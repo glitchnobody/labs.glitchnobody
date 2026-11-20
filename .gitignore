@@ -39,3 +39,4 @@ todos.json
 
 # Vercel build output (nitro on Vercel)
 .vercel
+.playwright-mcp/

@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { blocks } from "../lab";
@@ -7,10 +8,11 @@ import { play } from "../lab/sound";
 /* the component modal over the wall. The URL is the state: /<slug> opens it, /
    closes it, and Back / Forward walk between them (TanStack Router owns history;
    a[data-block] links are turned into router navigations by the root route) */
-export default function Modal() {
+export default function Modal({ back = "/components" }: { back?: "/" | "/components" }) {
   const params = useParams({ strict: false }) as { slug?: string };
   const slug = params.slug && params.slug in blocks ? params.slug : null;
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const dialog = useRef<HTMLDialogElement>(null);
   /* what the dialog shows; set on the client only (Detail reads the document),
      and it outlives slug while the card shrinks back */
@@ -36,16 +38,30 @@ export default function Modal() {
   const [opens, setOpens] = useState(0); // bumps on every open so the entrance runs even when view did not change
   const lifted = useRef<HTMLElement | null>(null);
   const last = useRef<string | null>(null);
+  const POP = "cubic-bezier(.16, 1, .3, 1)"; // Cosmos popover curve: quick start, soft settle, no overshoot
   const ease = "cubic-bezier(.4, 0, .1, 1)"; // eases in and out, so the trip reads as one smooth move
+  const mobile = () => matchMedia("(max-width: 820px)").matches; // a bottom drawer instead of the card lift
   const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const parts = (el: HTMLElement) => ({ st: el.querySelector<HTMLElement>(".stage"), pn: el.querySelector<HTMLElement>(".panel") });
+  const parts = (el: HTMLElement) => ({ st: el.querySelector<HTMLElement>(".stage"), pn: el.querySelector<HTMLElement>(".panel"), sh: el.querySelector<HTMLElement>(".sheet") });
+
+  /* warm a component up while the pointer is over its card, so opening it never waits on the module or the code view */
+  useEffect(() => {
+    const warm = (e: PointerEvent) => {
+      const slug = (e.target as Element).closest?.(".card")?.querySelector<HTMLElement>("a.card-open")?.dataset.block;
+      if (!slug || !blocks[slug]) return;
+      blocks[slug].load();
+      qc.prefetchQuery({ queryKey: ["code", slug], queryFn: () => fetch(`/api/code/${slug}`).then((r) => r.json()), staleTime: Infinity });
+    };
+    document.addEventListener("pointerover", warm);
+    return () => document.removeEventListener("pointerover", warm);
+  }, [qc]);
   const slideFrom = (st: HTMLElement, pn: HTMLElement) => `translateX(${st.getBoundingClientRect().right - pn.getBoundingClientRect().right}px)`;
 
   useEffect(() => {
     const el = dialog.current!;
     if (slug) setView(slug);
     if (slug && !el.open) {
-      const card = reduced() ? null : cardOf(slug);
+      const card = reduced() || mobile() ? null : cardOf(slug);
       opening.current = onScreen(card) ? card : null;
       /* open see-through: the backdrop only arrives with the animation, never as a first-frame flash */
       el.style.background = "";
@@ -56,16 +72,17 @@ export default function Modal() {
       play("expand", { volume: 0.35 });
     }
     if (!slug && el.open) {
-      const { st, pn } = parts(el);
-      const card = reduced() ? null : lifted.current;
+      const { st, pn, sh } = parts(el);
+      const card = reduced() || mobile() ? null : lifted.current;
       const c = onScreen(card);
       const bg = getComputedStyle(el).backgroundColor;
-      el.animate([{ backgroundColor: bg }, { backgroundColor: "transparent" }], { duration: 460, delay: 80, easing: "ease-in-out", fill: "forwards" });
+      el.animate([{ backgroundColor: bg }, { backgroundColor: "transparent" }], { duration: 360, delay: 60, easing: "ease-in-out", fill: "forwards" });
       let a: Animation;
       if (st && pn && c) {
-        pn.animate([{ transform: "none", opacity: 1 }, { transform: slideFrom(st, pn), opacity: 0 }], { duration: 300, easing: ease, fill: "forwards" });
-        a = st.animate([rest, pose(st, c)], { duration: 480, delay: 160, easing: ease, fill: "forwards" });
-      } else a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: "forwards" });
+        pn.animate([{ transform: "none", opacity: 1 }, { transform: slideFrom(st, pn), opacity: 0 }], { duration: 240, easing: ease, fill: "forwards" });
+        a = st.animate([rest, pose(st, c)], { duration: 380, delay: 120, easing: ease, fill: "forwards" });
+      } else if (sh && mobile() && !reduced()) a = sh.animate([{ transform: sh.style.transform || "none" }, { transform: "translateY(100%)" }], { duration: 300, easing: "cubic-bezier(.5, 0, .75, 0)", fill: "forwards" });
+      else a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: "forwards" });
       a.onfinish = () => {
         el.close();
         el.querySelectorAll("*").forEach((x) => x.getAnimations().forEach((y) => y.cancel()));
@@ -82,7 +99,7 @@ export default function Modal() {
 
   /* runs once the panels exist, before paint, so they never flash in place */
   useLayoutEffect(() => {
-    const el = dialog.current!, { st, pn } = parts(el);
+    const el = dialog.current!, { st, pn, sh } = parts(el);
     if (!view || !st || !pn || opening.current === undefined) return;
     const card = opening.current;
     opening.current = undefined;
@@ -93,19 +110,48 @@ export default function Modal() {
       a.onfinish = () => { el.style.background = ""; a.cancel(); };
     };
     if (card && c) {
+      const from = slideFrom(st, pn); // measured at rest: the stage's animation below moves its box
       lifted.current = card;
       card.setAttribute("data-lifted", "");
       st.style.zIndex = "1";
-      st.animate([{ ...pose(st, c), boxShadow: "0 0 0 transparent" }, { boxShadow: "0 30px 80px rgb(0 0 0 / 25%)", offset: 0.5 }, { ...rest, boxShadow: "0 0 0 transparent" }], { duration: 560, easing: ease });
-      pn.animate([{ transform: slideFrom(st, pn), opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 440, delay: 300, easing: ease, fill: "backwards" });
-      fadeIn(120, 520);
+      /* the stage travels on a soft spring (a touch of overshoot), the shadow rises and falls on its own curve */
+      st.style.willChange = "transform, clip-path"; // its own layer for the trip, so nothing repaints per frame
+      const trip = st.animate([pose(st, c), rest], { duration: 420, easing: POP });
+      trip.onfinish = () => { st.style.willChange = ""; };
+      st.animate([{ boxShadow: "0 0 0 transparent" }, { boxShadow: "0 30px 80px rgb(0 0 0 / 25%)", offset: 0.4 }, { boxShadow: "0 0 0 transparent" }], { duration: 420, easing: "ease-in-out" });
+      /* the panel pushes out from under the stage on a bouncier spring and stretches as it lands */
+      pn.animate([{ transform: `translateX(${from})` }, { transform: "none" }], { duration: 300, delay: 100, easing: POP, fill: "backwards" });
+      pn.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, delay: 100, easing: "ease-out", fill: "backwards" });
+      fadeIn(60, 380);
+    } else if (sh && mobile()) {
+      /* the drawer rises from the bottom edge with a little spring */
+      sh.animate([{ transform: "translateY(100%)" }, { transform: "none" }], { duration: 360, easing: POP });
+      fadeIn(0, 280);
     } else {
       el.querySelector<HTMLElement>(".detail")?.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: reduced() ? 150 : 260, easing: ease });
       fadeIn(0, 200);
     }
   }, [view, opens]);
 
-  const close = () => navigate({ to: "/", resetScroll: false });
+  const close = () => navigate({ to: back, resetScroll: false });
+
+  /* drag the grip down to dismiss the drawer; a short drag springs back */
+  const drag = (e: React.PointerEvent<HTMLElement>) => {
+    const sh = e.currentTarget.closest<HTMLElement>(".sheet")!;
+    const y0 = e.clientY, t0 = performance.now();
+    let dy = 0;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const move = (m: PointerEvent) => { dy = Math.max(0, m.clientY - y0); sh.style.transform = `translateY(${dy}px)`; };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      if (dy > 120 || dy / (performance.now() - t0) > 0.6) return close();
+      sh.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 300, easing: POP });
+      sh.style.transform = "";
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
 
   return (
     <dialog
@@ -118,7 +164,12 @@ export default function Modal() {
       }}
       onClick={(e) => e.target === e.currentTarget && close()}
     >
-      {view && <Detail key={view} slug={view} onClose={close} />}
+      {view && (
+        <div className="sheet">
+          <span className="sheet-grip" onPointerDown={drag} />
+          <Detail key={view} slug={view} onClose={close} />
+        </div>
+      )}
     </dialog>
   );
 }

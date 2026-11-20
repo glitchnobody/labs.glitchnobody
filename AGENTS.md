@@ -14,7 +14,7 @@ Before editing files for a substantial task:
 
 ## What this project is
 
-A personal showcase site of interactive React components (TanStack Start + TanStack Router, all React; moved from Astro on 2026-11-18, branch `tanstack`). The home page is a wall of live cards; clicking a card opens a modal with the live component, its settings (knobs), and its code with a "Copy prompt" button. The URL `/<slug>` is the open component.
+A personal showcase site of interactive React components (TanStack Start + TanStack Router, all React; moved from Astro on 2026-11-18, branch `tanstack`). The home page shows the six newest components (as live cards) and the six newest sounds, each with a "View all" link to `/components` (the full wall of cards) and `/sounds` (the sound library); clicking a card opens a modal with the live component, its settings (knobs), and its code with a "Copy prompt" button. The URL `/components/<slug>` is the open component (old `/<slug>` links redirect there), and `/sounds/<name>` is an open sound.
 
 The goal is **60 components**. Work happens in two phases:
 

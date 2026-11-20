@@ -1,0 +1,177 @@
+/* internal component library: a settings panel on the left, the canvas on the right */
+.lib {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: var(--column);
+  height: calc(100dvh - 64px);
+  margin-inline: auto;
+  padding: 12px var(--gutter);
+}
+
+.lib-panel,
+.lib-canvas {
+  position: relative;
+  min-height: 0;
+  border-radius: var(--r-panel);
+  background: var(--s-surface);
+}
+
+.lib-panel {
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 1px var(--s-border);
+}
+
+.lib-head,
+.lib-foot {
+  display: grid;
+  flex: none;
+  gap: 8px;
+  padding: 12px;
+}
+
+.lib-head { border-bottom: 1px dashed var(--s-border); }
+.lib-foot { border-top: 1px dashed var(--s-border); grid-template-columns: 1fr 1fr; }
+.lib-head .seg { display: flex; }
+.lib-head .seg > * { flex: 1; justify-content: center; }
+
+.lib-body {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: 4px;
+  min-height: 0;
+  padding: 12px;
+  overflow: auto;
+}
+
+.lib-body h3 {
+  margin: 12px 0 4px;
+  color: var(--s-ink-2);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lib-body h3:first-child { margin-top: 0; }
+.lib-hint { margin: 0 0 8px; color: var(--s-ink-2); font-size: 13px; }
+
+.lib-field {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  font-size: 13px;
+}
+
+.lib-field > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.lib-field input[type="text"],
+.lib-field select {
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--s-surface-hover);
+  color: var(--s-ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.lib-field select { width: 100%; }
+.lib-field input[type="range"] { width: 100%; accent-color: var(--s-ink); }
+
+.lib-color {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 8px;
+}
+
+.lib-color i,
+.lib-color input[type="color"] {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-control);
+  box-shadow: inset 0 0 0 1px var(--s-border);
+  background: none;
+  cursor: pointer;
+}
+
+.lib-color i { display: block; }
+.lib-color-row { grid-template-columns: 1fr 190px; }
+.lib-color-row[data-changed] > span::before { content: "• "; color: var(--s-ink); }
+
+/* the canvas wears the edited theme; the panel keeps the site's */
+.lib-canvas {
+  overflow: auto;
+  padding: 24px;
+  background: var(--s-bg);
+  color: var(--s-ink);
+  font-family: var(--font-ui);
+  box-shadow: 0 0 0 1px var(--s-border);
+}
+
+.lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+
+/* transparent tiles: dotted outline, solid for the selected one */
+.lib-tile {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border: 1px dashed var(--s-ink-3);
+  border-radius: var(--r-panel);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lib-tile:hover { border-color: var(--s-ink-2); }
+.lib-tile[aria-pressed="true"] { border: 1px solid var(--s-ink); }
+.lib-tile:focus-visible { outline: 2px solid var(--s-ink-3); outline-offset: 2px; }
+.lib-tile > small { color: var(--s-ink-2); font-size: 12px; }
+.lib-tile-body { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-height: 56px; pointer-events: none; }
+.lib-tile-body .card { width: 260px; height: 180px; min-height: 0; padding: 0; }
+.lib-tile-body .card .card-name,
+.lib-tile-body .card .card-tools { opacity: 1; transform: none; }
+
+.lib-json {
+  position: absolute;
+  inset: 12px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--r-panel);
+  background: var(--s-elevated);
+  box-shadow: var(--s-shadow-menu);
+}
+
+.lib-json pre {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  overflow: auto;
+  font: 12px/1.5 var(--font-code);
+}
+
+.lib-json div { display: flex; gap: 8px; justify-content: flex-end; }
+
+@media (max-width: 800px) {
+  .lib { grid-template-columns: 1fr; height: auto; }
+  .lib-panel { max-height: 70dvh; }
+  .lib-canvas { min-height: 60dvh; }
+}
