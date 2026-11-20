@@ -681,7 +681,7 @@ dialog.modal::backdrop {
   position: relative;
   grid-column: 1 / -1;
   height: 26px; /* fixed, so opening the slider never moves what is below it */
-  margin-top: 10px;
+  margin-top: 4px;
 }
 
 .rail::before,
@@ -694,8 +694,8 @@ dialog.modal::backdrop {
 
 /* at rest: one thin line */
 .rail::before {
-  top: auto;
-  bottom: 4px; /* everything stands on the bottom edge and grows upward */
+  bottom: auto;
+  top: 4px; /* everything hangs from the top edge, by the label, and grows downward */
   height: 1px;
   background: var(--s-border);
 }
@@ -703,26 +703,26 @@ dialog.modal::backdrop {
 /* open: real ticks, so each can have its own height */
 .rail .ticks {
   position: absolute;
-  inset: 0;
+  inset: 4px 0 0; /* tick tops start on the base line */
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   opacity: 0;
   transition: opacity var(--s-dur-med) var(--s-ease-ui);
 }
 
 .rail .ticks i {
-  transform-origin: bottom;
+  transform-origin: top;
   width: 2px;
   height: 60%; /* the resting height; a wake of scaleY lifts it while dragging */
-  border-radius: var(--r-pill);
   background: var(--s-ink-3);
   opacity: 0.6;
   transition: height 160ms var(--s-ease-ui), background-color var(--s-dur-fast) var(--s-ease-ui), opacity var(--s-dur-fast) var(--s-ease-ui);
 }
 
+/* on hover: the handle brightest, then the ticks left of it, then the ones right of it */
 .rail .ticks i[data-on] {
-  background: var(--s-ink);
+  background: var(--s-ink-2);
   opacity: 1;
 }
 
@@ -732,17 +732,17 @@ dialog.modal::backdrop {
 
 .rail .fill {
   position: absolute;
-  bottom: 3.5px;
+  top: 3.5px;
   left: 0;
   width: var(--p);
   height: 2px;
-  background: var(--s-ink-3); /* solid at rest; the ticks only appear on hover */
-  transition: opacity var(--s-dur-fast) var(--s-ease-ui);
+  background: var(--s-ink-2); /* drawn over the base line */
+  transition: background-color var(--s-dur-fast) var(--s-ease-ui);
 }
 
 .rail .thumb {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: var(--p);
   width: 9px;
   height: 9px;
@@ -750,13 +750,7 @@ dialog.modal::backdrop {
   border-radius: var(--r-pill);
   background: var(--s-ink);
   /* no transition on left: the dot follows the value instantly */
-  transition: width 420ms var(--s-ease-ui), height 420ms var(--s-ease-ui);
-}
-
-.knob.range:hover .rail::before,
-.knob.range:has(:focus-visible) .rail::before,
-.knob.range:has(:active) .rail::before {
-  opacity: 0;
+  transition: width 420ms var(--s-ease-ui), height 420ms var(--s-ease-ui), top 420ms var(--s-ease-ui);
 }
 
 .knob.range:hover .ticks,
@@ -765,18 +759,13 @@ dialog.modal::backdrop {
   opacity: 1;
 }
 
-.knob.range:hover .fill,
-.knob.range:has(:focus-visible) .fill,
-.knob.range:has(:active) .fill {
-  opacity: 0;
-}
-
 .knob.range:hover .thumb,
 .knob.range:has(:focus-visible) .thumb,
 .knob.range:has(:active) .thumb {
   /* the round dot stretches into a tall pill: the last tick and the handle in one */
+  top: 2px; /* 2px above the base line */
   width: 3px;
-  height: 100%;
+  height: calc(100% - 4px);
 }
 
 /* a choice of a few: outlined buttons, the chosen one bright */
@@ -1737,18 +1726,8 @@ html:has(dialog.modal[open]) .wall *::after {
   background: var(--s-surface);
 }
 
-/* a hairline between settings, centred in the space between them */
 .panel > .knob + .knob {
   margin-top: 12px;
-}
-
-.panel > .knob + .knob::before {
-  content: "";
-  position: absolute;
-  inset: -10px 0 auto;
-  height: 1px;
-  background: var(--s-border);
-  opacity: 0.6;
 }
 
 /* ══ Cosmos controls (2026-11-20) ══════════════════════════
@@ -2007,14 +1986,11 @@ html:has(dialog.modal[open]) .wall *::after {
 }
 
 /* slider */
-.rail .fill {
-  background: var(--s-ink-2);
-}
-
 .rail .thumb {
   transition:
     width var(--s-dur-med) var(--s-ease-ui),
-    height var(--s-dur-med) var(--s-ease-ui);
+    height var(--s-dur-med) var(--s-ease-ui),
+    top var(--s-dur-med) var(--s-ease-ui);
 }
 
 /* wall cards and the modal stage are media: 8px; the settings panel is a panel: 12px */
